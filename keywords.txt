@@ -1,0 +1,21 @@
+#######################################
+# Syntax Coloring Map for Filters
+#######################################
+
+#######################################
+# Data types (KEYWORD1)
+#######################################
+
+FilterNull              KEYWORD1
+FilterMovingAverage     KEYWORD1
+IIR_filter              KEYWORD1
+FIR_filter              KEYWORD1
+ButterWorthFilter       KEYWORD1
+
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+update                  KEYWORD2
+reset                   KEYWORD2
