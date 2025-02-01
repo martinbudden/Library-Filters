@@ -63,14 +63,14 @@ See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 class IIR_filter {
 public:
     explicit IIR_filter(float frequencyCutoff) : _state(0.0F) {
-        _omega = 2.0F * M_PI * frequencyCutoff;
+        _omega = 2.0F * static_cast<float>(M_PI) * frequencyCutoff;
     }
     IIR_filter(float frequencyCutoff, float dT) : _state(0.0F) {
         setCutoffFrequency(frequencyCutoff, dT);
     }
     IIR_filter() {}
     inline void setCutoffFrequency(float frequencyCutoff, float dT) {
-        _omega = 2.0F * M_PI * frequencyCutoff;
+        _omega = 2.0F * static_cast<float>(M_PI) * frequencyCutoff;
         _alpha = _omega*dT/(_omega*dT + 1.0F);
     }
     inline void setAlpha(float alpha) { _alpha = alpha; }
