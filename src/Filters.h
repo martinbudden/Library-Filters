@@ -41,7 +41,7 @@ inline float FilterMovingAverage<N>::update(float input)
     if (_count < N) {
         _samples[_index++] = input;
         ++_count;
-        return _sum / _count;
+        return _sum / static_cast<float>(_count);
     } else {
         if (_index == N) {
             _index = 0;
