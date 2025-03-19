@@ -7,8 +7,9 @@ void setUp() {
 void tearDown() {
 }
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 void test_null_filter() {
-    FilterNull filter;
+    FilterNull filter; // NOLINT(cppcoreguidelines-init-variables)
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.update(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.update(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, filter.update(-1.0F));
@@ -100,6 +101,7 @@ void test_IIR_alpha_filter() {
     out = filter.update(15);
     TEST_ASSERT_EQUAL_FLOAT(0.8*15.0 +0.2*(0.8*10.0 + 0.2*8.0), out);
 }
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {

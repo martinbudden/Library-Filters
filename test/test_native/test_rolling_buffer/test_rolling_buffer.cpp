@@ -10,6 +10,7 @@ void tearDown() {
     // clean stuff up here
 }
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 void test_rolling_buffer_size() {
     static RollingBuffer<int, 4> rb;
     TEST_ASSERT_TRUE(rb.capacity() == 4);
@@ -270,6 +271,7 @@ printf("19\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 }
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
