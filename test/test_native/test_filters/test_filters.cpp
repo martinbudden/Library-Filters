@@ -44,7 +44,7 @@ public:
 };
 
 void test_IIR_filter() {
-    constexpr float dT = 5.0 / 1000.0;
+    constexpr float dT = 5.0F / 1000.0F;
     {
     IIR_filter_test filter(0.0);
     TEST_ASSERT_EQUAL_FLOAT(0.0, filter.getOmega());

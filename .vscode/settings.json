@@ -10,7 +10,21 @@
         "hicpp",
         "libc",
         "llvmlibc",
+        "noreturn",
         "pioenvs",
-        "suppr"
+        "suppr",
+        "unflags",
+        "Wattributes",
+        "Wcast",
+        "Wdisabled",
+        "Wdouble",
+        "Wextra",
+        "Wfloat",
+        "Winline",
+        "Wmissing",
+        "Wpacked",
+        "Wpadded",
+        "Wshadow",
+        "Wsign"
     ]
 }
