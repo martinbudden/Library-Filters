@@ -4,10 +4,15 @@
     "keywords": "filters IIR FIR moving average exponential finite infinite impulse response low-pass",
     "authors": {
         "name": "Martin Budden",
+        "url": "https://github.com/martinbudden"
+    },
+    "repository": {
+        "type": "git",
         "url": "https://github.com/martinbudden/Library-Filters.git"
     },
     "license": "MIT",
     "version": "0.0.1",
     "frameworks": "*",
-    "platforms": "*"
+    "platforms": "*",
+    "headers": [ "Filters.h", "RollingBuffer.h" ]
 }

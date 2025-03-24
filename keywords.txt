@@ -11,7 +11,7 @@ FilterMovingAverage     KEYWORD1
 IIR_filter              KEYWORD1
 FIR_filter              KEYWORD1
 ButterWorthFilter       KEYWORD1
-
+RollingBuffer           KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
