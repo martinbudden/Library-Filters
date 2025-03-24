@@ -1,5 +1,4 @@
 #include <RollingBuffer.h>
-#include <cstdio>
 #include <unity.h>
 
 void setUp() {
@@ -72,31 +71,25 @@ void test_rolling_buffer_iteration() {
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_FALSE(it != end);
     ++it;
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("10\r\n");
     rb.push_back(10);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 10);
     ++it;
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("11\r\n");
     rb.push_back(11);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 10);
     ++it;
@@ -106,12 +99,10 @@ printf("11\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("12\r\n");
     rb.push_back(12);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 10);
     ++it;
@@ -124,12 +115,10 @@ printf("12\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("13\r\n");
     rb.push_back(13);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 10);
     ++it;
@@ -145,12 +134,10 @@ printf("13\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("14\r\n");
     rb.push_back(14);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 11);
     ++it;
@@ -166,12 +153,10 @@ printf("14\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("15\r\n");
     rb.push_back(15);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 12);
     ++it;
@@ -187,12 +172,10 @@ printf("15\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("16\r\n");
     rb.push_back(16);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 13);
     ++it;
@@ -208,12 +191,10 @@ printf("16\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("17\r\n");
     rb.push_back(17);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 14);
     ++it;
@@ -229,12 +210,10 @@ printf("17\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("18\r\n");
     rb.push_back(18);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 15);
     ++it;
@@ -250,12 +229,10 @@ printf("18\r\n");
     TEST_ASSERT_FALSE(it != end);
     }
 
-printf("19\r\n");
     rb.push_back(19);
     {
     auto it = rb.begin();
     const auto end = rb.end();
-    printf("bPos=%d,ePos=%d\r\n", it.pos(), end.pos());
     TEST_ASSERT_TRUE(it != end);
     TEST_ASSERT_TRUE(*it == 16);
     ++it;

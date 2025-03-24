@@ -18,13 +18,17 @@
         "Wcast",
         "Wdisabled",
         "Wdouble",
+        "Werror",
         "Wextra",
         "Wfloat",
+        "Wimplicit",
         "Winline",
         "Wmissing",
+        "Wnarrowing",
         "Wpacked",
         "Wpadded",
         "Wshadow",
-        "Wsign"
+        "Wsign",
+        "Wtrampolines"
     ]
 }
