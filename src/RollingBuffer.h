@@ -25,6 +25,7 @@ public:
     public:
         Iterator(const RollingBuffer& rb, size_t pos) : _rb(rb), _pos(pos) {}
         inline const T& operator*() const { return _rb._buffer[_pos]; }
+        inline const T* operator->() const { return &_rb._buffer[_pos]; }
         inline Iterator& operator++() { ++_pos; if (_pos > _rb._size) _pos = 0; return *this; }
         inline bool operator!=(const Iterator& other) const { return _pos != other._pos || &_rb != &other._rb; }
         size_t pos() const { return _pos; }
