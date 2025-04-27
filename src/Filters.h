@@ -26,7 +26,7 @@ public:
 public:
     inline void reset() { _sum = 0.0F; _count = 0; _index = 0;}
     inline float update(float input);
-    inline float update(float input, [[maybe_unused]] float dt) { return update(input); }
+    inline float update(float input, float dt) { (void)dt; return update(input); }
 private:
     size_t _count {0};
     size_t _index {0};
@@ -46,9 +46,8 @@ inline float FilterMovingAverage<N>::update(float input)
         if (_index == N) {
             _index = 0;
         }
-        float& oldest = _samples[_index++];
-        _sum -= oldest;
-        oldest = input;
+        _sum -= _samples[_index];
+        _samples[_index++] = input;
     }
     constexpr float nReciprocal = 1.0F / N;
     return _sum * nReciprocal;
