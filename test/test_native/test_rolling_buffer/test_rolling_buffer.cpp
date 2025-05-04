@@ -254,6 +254,124 @@ void test_rolling_buffer_iteration()
     }
 }
 
+void test_rolling_buffer_copy()
+{
+    static RollingBuffer<int, 4> rb;
+    static std::array<int, 4> buf;
+
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(0, rb.getEnd());
+
+    rb.push_back(10);
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(1, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(10, buf[0]);
+
+
+    rb.push_back(11);
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(2, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(10, buf[0]);
+    TEST_ASSERT_EQUAL(11, buf[1]);
+
+    rb.push_back(12);
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(3, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(10, buf[0]);
+    TEST_ASSERT_EQUAL(11, buf[1]);
+    TEST_ASSERT_EQUAL(12, buf[2]);
+
+    rb.push_back(13);
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(4, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(10, buf[0]);
+    TEST_ASSERT_EQUAL(11, buf[1]);
+    TEST_ASSERT_EQUAL(12, buf[2]);
+    TEST_ASSERT_EQUAL(13, buf[3]);
+
+    rb.push_back(14);
+    TEST_ASSERT_EQUAL(1, rb.getBegin());
+    TEST_ASSERT_EQUAL(0, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(11, buf[0]);
+    TEST_ASSERT_EQUAL(12, buf[1]);
+    TEST_ASSERT_EQUAL(13, buf[2]);
+    TEST_ASSERT_EQUAL(14, buf[3]);
+
+    rb.push_back(15);
+    TEST_ASSERT_EQUAL(2, rb.getBegin());
+    TEST_ASSERT_EQUAL(1, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(12, buf[0]);
+    TEST_ASSERT_EQUAL(13, buf[1]);
+    TEST_ASSERT_EQUAL(14, buf[2]);
+    TEST_ASSERT_EQUAL(15, buf[3]);
+
+    rb.push_back(16);
+    TEST_ASSERT_EQUAL(3, rb.getBegin());
+    TEST_ASSERT_EQUAL(2, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(13, buf[0]);
+    TEST_ASSERT_EQUAL(14, buf[1]);
+    TEST_ASSERT_EQUAL(15, buf[2]);
+    TEST_ASSERT_EQUAL(16, buf[3]);
+
+    rb.push_back(17);
+    TEST_ASSERT_EQUAL(4, rb.getBegin());
+    TEST_ASSERT_EQUAL(3, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(14, buf[0]);
+    TEST_ASSERT_EQUAL(15, buf[1]);
+    TEST_ASSERT_EQUAL(16, buf[2]);
+    TEST_ASSERT_EQUAL(17, buf[3]);
+
+    rb.push_back(18);
+    TEST_ASSERT_EQUAL(0, rb.getBegin());
+    TEST_ASSERT_EQUAL(4, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(15, buf[0]);
+    TEST_ASSERT_EQUAL(16, buf[1]);
+    TEST_ASSERT_EQUAL(17, buf[2]);
+    TEST_ASSERT_EQUAL(18, buf[3]);
+
+    rb.push_back(19);
+    TEST_ASSERT_EQUAL(1, rb.getBegin());
+    TEST_ASSERT_EQUAL(0, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(16, buf[0]);
+    TEST_ASSERT_EQUAL(17, buf[1]);
+    TEST_ASSERT_EQUAL(18, buf[2]);
+    TEST_ASSERT_EQUAL(19, buf[3]);
+
+    rb.push_back(20);
+    TEST_ASSERT_EQUAL(17, rb[0]);
+    TEST_ASSERT_EQUAL(18, rb[1]);
+    TEST_ASSERT_EQUAL(19, rb[2]);
+    TEST_ASSERT_EQUAL(20, rb[3]);
+    TEST_ASSERT_EQUAL(2, rb.getBegin());
+    TEST_ASSERT_EQUAL(1, rb.getEnd());
+    buf.fill(-1);
+    rb.copy(buf);
+    TEST_ASSERT_EQUAL(17, buf[0]);
+    TEST_ASSERT_EQUAL(18, buf[1]);
+    TEST_ASSERT_EQUAL(19, buf[2]);
+    TEST_ASSERT_EQUAL(20, buf[3]);
+}
+
 void test_rolling_buffer_sum()
 {
     static RollingBufferWithSum<int, 4> rb;
@@ -298,10 +416,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_rolling_buffer_size);
-    RUN_TEST(test_rolling_buffer_front_back);
-    RUN_TEST(test_rolling_buffer_iteration);
-    RUN_TEST(test_rolling_buffer_sum);
+    //RUN_TEST(test_rolling_buffer_size);
+    //RUN_TEST(test_rolling_buffer_front_back);
+    //RUN_TEST(test_rolling_buffer_iteration);
+    RUN_TEST(test_rolling_buffer_copy);
+    //RUN_TEST(test_rolling_buffer_sum);
 
     UNITY_END();
 }

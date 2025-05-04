@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+#include <cstring>
 #include <stddef.h>
 
 
@@ -25,6 +27,17 @@ public:
     }
     inline const T& front() const { return _buffer[_begin]; }
     inline const T& back() const { return _end > 0 ? _buffer[_end - 1] : _buffer[CAPACITY]; }
+    inline void copy(std::array<T, C>& dest) const {
+        if (_end >= _begin) {
+            memcpy(&dest[0], &_buffer[_begin], (_end - _begin) * sizeof(T));
+        } else {
+            memcpy(&dest[0], &_buffer[_begin], (CAPACITY + 1 - _begin) * sizeof(T));
+            memcpy(&dest[CAPACITY + 1 - _begin], &_buffer[0], _end * sizeof(T));
+        }
+    }
+    inline size_t getBegin() { return _begin; }
+    inline size_t getEnd() { return _end; }
+    
     inline size_t capacity() const { return CAPACITY; }
 
     class Iterator {
@@ -93,6 +106,14 @@ public:
     }
     inline const T& front() const { return _buffer[_begin]; }
     inline const T& back() const { return _end > 0 ? _buffer[_end - 1] : _buffer[CAPACITY]; }
+    inline void copy(std::array<T, C>& dest) const {
+        if (_end >= _begin) {
+            memcpy(&dest[0], &_buffer[_begin], (_end - _begin) * sizeof(T));
+        } else {
+            memcpy(&dest[0], &_buffer[_begin], (CAPACITY + 1 - _begin) * sizeof(T));
+            memcpy(&dest[CAPACITY + 1 - _begin], &_buffer[0], _end * sizeof(T));
+        }
+    }
     inline size_t capacity() const { return CAPACITY; }
     inline T sum() const { return _sum; }
     T recalculateSum();
