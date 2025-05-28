@@ -56,8 +56,8 @@ public:
     const Iterator end() const { return Iterator(*this, _end); }
 private:
     size_t _begin; //!< The virtual beginning of the circular buffer.
-    size_t _end;  //!< The virtual end of the circular buffer (one behind the last element).
-    size_t _size; //!< The number of items in the circular buffer.
+    size_t _end;   //!< The virtual end of the circular buffer (one behind the last element).
+    size_t _size;  //!< The number of items in the circular buffer.
     T _buffer[CAPACITY + 1] {}; // need one spare empty cell so we can avoid _end == _begin when full
 };
 
@@ -134,8 +134,8 @@ public:
     const Iterator end() const { return Iterator(*this, _end); }
 private:
     size_t _begin; //!< The virtual beginning of the circular buffer.
-    size_t _end;  //!< The virtual end of the circular buffer (one behind the last element).
-    size_t _size; //!< The number of items in the circular buffer.
+    size_t _end;   //!< The virtual end of the circular buffer (one behind the last element).
+    size_t _size;  //!< The number of items in the circular buffer.
     T _sum {};
     T _buffer[CAPACITY + 1] {}; // need one spare empty cell so we can avoid _end == _begin when full
 };
