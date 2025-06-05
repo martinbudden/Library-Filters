@@ -10,8 +10,11 @@ class FilterNull {
 public:
     FilterNull() {}
 public:
-    inline void setCutoffFrequency(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
+    inline void init(float k) { (void)k; }
     inline void reset() {}
+    inline void setToPassthrough() {}
+    inline void setCutoffFrequency(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
+    inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
     inline float update(float input) { return input; }
     inline float update(float input, float dT) { (void)dT; return input; }
 };
@@ -139,14 +142,17 @@ public:
     IIR_filter(float frequencyCutoff, float dT): _state(0.0F) {
         setCutoffFrequency(frequencyCutoff, dT);
     }
-    IIR_filter() : _alpha(0.0F), _omega(0.0F), _state(0.0F) {}
+    IIR_filter() : _alpha(1.0F), _omega(0.0F), _state(0.0F) {}
 public:
+    inline void init(float alpha) { _alpha = alpha; _state = 0.0F; }
+    inline void reset() { _state = 0.0F; }
+    inline void setToPassthrough() { _alpha = 1.0F; reset(); }
+    inline void setAlpha(float alpha) { _alpha = alpha; }
     inline void setCutoffFrequency(float frequencyCutoff, float dT) {
         _omega = 2.0F * static_cast<float>(M_PI) * frequencyCutoff;
         _alpha = _omega*dT/(_omega*dT + 1.0F);
     }
-    inline void setAlpha(float alpha) { _alpha = alpha; }
-    inline void reset() { _state = 0.0F; }
+    inline void setCutoffFrequencyAndReset(float frequencyCutoff, float dT) { setCutoffFrequency(frequencyCutoff, dT); reset(); }
     inline float update(float input, float dT) { // Variable dT IIR_filter update;
         const float alpha = _omega*dT/(_omega*dT + 1.0F);
         _state += alpha * (input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
@@ -169,15 +175,18 @@ First order power transfer filter
 class PowerTransferFilter1 {
 public:
     explicit PowerTransferFilter1(float k) : _k(k), _state(0.0F) {}
-    PowerTransferFilter1() : PowerTransferFilter1(0.0F) {}
+    PowerTransferFilter1() : PowerTransferFilter1(1.0F) {}
     PowerTransferFilter1(float cutoffFrequency, float dT) : PowerTransferFilter1(gain(cutoffFrequency, dT)) {}
 public:
     inline void init(float k) { _k = k; _state = 0.0F; }
+    inline void reset() { _state = 0.0F; }
+    inline void setToPassthrough() { _k = 1.0F; reset(); }
     inline float update(float input) {
         _state += _k * (input - _state);
         return _state;
     }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
+    inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     // Calculates filter gain based on delay (time constant of filter) - time it takes for filter response to reach 63.2% of a step input.
     static inline float gainFromDelay(float delay, float dT) {
         if (delay <= 0) { return 1.0F; } // gain of 1.0F means no filtering
@@ -200,16 +209,19 @@ Second order power transfer filter
 class PowerTransferFilter2 {
 public:
     explicit PowerTransferFilter2(float k) : _k(k), _state0(0.0F), _state1(0.0F) {}
-    PowerTransferFilter2() : PowerTransferFilter2(0.0F) {}
+    PowerTransferFilter2() : PowerTransferFilter2(1.0F) {}
     PowerTransferFilter2(float cutoffFrequency, float dT) : PowerTransferFilter2(gain(cutoffFrequency, dT)) {}
 public:
     inline void init(float k) { _state0 = 0.0F; _state1 = 0.0F; _k = k; }
+    inline void reset() { _state0 = 0.0F; _state1 = 0.0F; }
+    inline void setToPassthrough() { _k = 1.0F; reset(); }
     inline float update(float input) {
         _state1 += _k * (input - _state1);
         _state0 += _k * (_state1 - _state0);
         return _state0;
     }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
+    inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     static inline float gainFromDelay(float delay, float dT) {
         if (delay <= 0) { return 1.0F; } // gain of 1.0F means no filtering
         const float cutoffFrequency = 1.0F / (static_cast<float>(M_PI) * delay * cutoffCorrection);
@@ -234,10 +246,12 @@ Third order power transfer filter
 class PowerTransferFilter3 {
 public:
     explicit PowerTransferFilter3(float k) : _k(k), _state0(0.0F), _state1(0.0F), _state2(0.0F) {}
-    PowerTransferFilter3() : PowerTransferFilter3(0.0F) {}
+    PowerTransferFilter3() : PowerTransferFilter3(1.0F) {}
     PowerTransferFilter3(float cutoffFrequency, float dT) : PowerTransferFilter3(gain(cutoffFrequency, dT)) {}
 public:
     inline void init(float k) { _state0 = 0.0F; _state1 = 0.0F; _state2 = 0.0F; _k = k; }
+    inline void reset() { _state0 = 0.0F; _state1 = 0.0F; _state2 = 0.0F; }
+    inline void setToPassthrough() { _k = 1.0F; reset(); }
     inline float update(float input) {
         _state2 += _k * (input - _state2);
         _state1 += _k * (_state2 - _state1);
@@ -245,6 +259,7 @@ public:
         return _state0;
     }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
+    inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     static inline float gainFromDelay(float delay, float dT) {
         if (delay <= 0) { return 1.0F; } // gain of 1.0F means no filtering
         const float cutoffFrequency = 1.0F / (static_cast<float>(M_PI) * delay * cutoffCorrection);
