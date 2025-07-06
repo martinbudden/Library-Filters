@@ -16,8 +16,8 @@ public:
     inline void setToPassthrough() {}
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
     inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
-    inline float update(float input) { return input; }
-    inline float update(float input, float dT) { (void)dT; return input; }
+    inline float filter(float input) { return input; }
+    inline float filter(float input, float dT) { (void)dT; return input; }
 };
 
 
@@ -31,8 +31,8 @@ public:
     FilterMovingAverage() {} // cppcheck-suppress uninitMemberVar
 public:
     inline void reset() { _sum = 0.0F; _count = 0; _index = 0;}
-    inline float update(float input);
-    inline float update(float input, float dT) { (void)dT; return update(input); }
+    inline float filter(float input);
+    inline float filter(float input, float dT) { (void)dT; return filter(input); }
 protected:
     size_t _count {0};
     size_t _index {0};
@@ -41,7 +41,7 @@ protected:
 };
 
 template <size_t N>
-inline float FilterMovingAverage<N>::update(float input)
+inline float FilterMovingAverage<N>::filter(float input)
 {
     _sum += input;
     if (_count < N) {
@@ -67,7 +67,7 @@ template <size_t N>
 class FIR_filter {
 public:
     explicit FIR_filter(const float* coefficients) : _coefficients(coefficients), _back(0) { memset(_buffer, 0, sizeof(_buffer)); }
-    inline float update(float input);
+    inline float filter(float input);
 private:
     enum { ORDER = N };
 protected:
@@ -77,7 +77,7 @@ protected:
 };
 
 template <size_t N>
-inline float FIR_filter<N>::update(float input) {
+inline float FIR_filter<N>::filter(float input) {
     auto index = _back;
 
     // Add the input value to the back of the circular buffer
@@ -103,7 +103,7 @@ inline float FIR_filter<N>::update(float input) {
 class ButterWorthFilter {
 public:
     ButterWorthFilter(float a1, float a2, float b0, float b1, float b2) : _a1(a1), _a2(a2), _b0(b0), _b1(b1), _b2(b2), _x0(0.0F), _x1(0.0F), _y0(0.0F), _y1(0.0F) {}
-    inline float update(float input);
+    inline float filter(float input);
     inline void reset() { _x0 = 0.0F; _x1 = 0.0F; _y0 = 0.0F; _y1 = 0.0F; }
 protected:
     float _a1;
@@ -118,7 +118,7 @@ protected:
     float _y1;
 };
 
-inline float ButterWorthFilter::update(float input) {
+inline float ButterWorthFilter::filter(float input) {
     const float output = _b0 * input - _a2 * _y1 + _b1 * _x0 + _b2 * _x1 - _a1 * _y0;
     _y1 = _y0;
     _y0 = output;
@@ -154,12 +154,12 @@ public:
         _alpha = _omega*dT/(_omega*dT + 1.0F);
     }
     inline void setCutoffFrequencyAndReset(float frequencyCutoff, float dT) { setCutoffFrequency(frequencyCutoff, dT); reset(); }
-    inline float update(float input, float dT) { // Variable dT IIR_filter update;
+    inline float filter(float input, float dT) { // Variable dT IIR_filter filter;
         const float alpha = _omega*dT/(_omega*dT + 1.0F);
         _state += alpha * (input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
         return _state;
     }
-    inline float update(float input) { // Constant dT IIR_filter update
+    inline float filter(float input) { // Constant dT IIR_filter filter
         _state += _alpha * (input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
         return _state;
     }
@@ -182,7 +182,7 @@ public:
     inline void init(float k) { _k = k; _state = 0.0F; }
     inline void reset() { _state = 0.0F; }
     inline void setToPassthrough() { _k = 1.0F; reset(); }
-    inline float update(float input) {
+    inline float filter(float input) {
         _state += _k * (input - _state);
         return _state;
     }
@@ -216,7 +216,7 @@ public:
     inline void init(float k) { _state0 = 0.0F; _state1 = 0.0F; _k = k; }
     inline void reset() { _state0 = 0.0F; _state1 = 0.0F; }
     inline void setToPassthrough() { _k = 1.0F; reset(); }
-    inline float update(float input) {
+    inline float filter(float input) {
         _state1 += _k * (input - _state1);
         _state0 += _k * (_state1 - _state0);
         return _state0;
@@ -253,7 +253,7 @@ public:
     inline void init(float k) { _state0 = 0.0F; _state1 = 0.0F; _state2 = 0.0F; _k = k; }
     inline void reset() { _state0 = 0.0F; _state1 = 0.0F; _state2 = 0.0F; }
     inline void setToPassthrough() { _k = 1.0F; reset(); }
-    inline float update(float input) {
+    inline float filter(float input) {
         _state2 += _k * (input - _state2);
         _state1 += _k * (_state2 - _state1);
         _state0 += _k * (_state1 - _state0);
@@ -281,15 +281,32 @@ protected:
 
 /*!
 Biquad filter, see https://en.wikipedia.org/wiki/Digital_biquad_filter
+
+Has additional `_weight` member data, which allows the filter to combine input and output using `filterWeighted()` function.
+`_weight` is ignored when using `filter()` function.
 */
 class BiquadFilter {
 public:
     BiquadFilter(float a1, float a2, float b0, float b1, float b2) :
         _a1(a1), _a2(a2),
-        _b0(b0), _b1(b1), _b2(b2)
+        _b0(b0), _b1(b1), _b2(b2),
+        _weight(1.0F)
         {}
-    BiquadFilter() : BiquadFilter(0.0F, 0.0F, 0.0F, 0.0F, 0.0F) {}
+    BiquadFilter() : BiquadFilter(0.0F, 0.0F, 1.0F, 0.0F, 0.0F) {}
 public:
+    void setWeight(float weight) { _weight = weight; }
+    void setParameters(float a1, float a2, float b0, float b1, float b2, float weight) {
+        _a1 = a1;
+        _a2 = a2;
+        _b0 = b0;
+        _b1 = b1;
+        _b2 = b2;
+        _weight = weight;
+    }
+    void setParameters(float a1, float a2, float b0, float b1, float b2) {
+        setParameters(a1, a2, b0, b1, b2, 1.0F);
+    }
+    //! Copy parameters from another Biquad filter
     void setParameters(const BiquadFilter& other) {
         _a1 = other._a1;
         _a2 = other._a2;
@@ -300,8 +317,9 @@ public:
     }
 
     inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+    inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F;  _weight = 1.0F; reset(); }
 
-    inline float update(float input) {
+    inline float filter(float input) {
         const float output = _b0*input + _b1*_x1 + _b2*_x2 - _a1*_y1 - _a2*_y2;
         _x2 = _x1;
         _x1 = input;
@@ -310,8 +328,9 @@ public:
         return output;
     }
 
-    inline float updateWeighted(float input) {
-        const float output = update(input);
+    inline float filterWeighted(float input) {
+        const float output = filter(input);
+        // weight of 1.0 gives just output, weight of 0.0 gives just input
         return _weight*(output - input) + input;
     }
 
@@ -323,6 +342,7 @@ public:
     }
 
     inline float calculateOmega(float frequency) const { return 2.0F * static_cast<float>(M_PI) * frequency * static_cast<float>(_loopTimeUs) * 0.000001F; }
+    void setLowPassFrequency(float frequency, float weight);
     void setNotchFrequency(float frequency, float weight);
     void setNotchFrequency(float sinOmega, float cosOmega, float weight);
 
@@ -345,20 +365,23 @@ protected:
     float _y2 {0.0F};
 
     float _Q {0.0F};
-    float _weight {0.0F};
+    float _weight {1.0F}; //<! weight of 1.0 gives just output, weight of 0.0 gives just input
     uint32_t _loopTimeUs {0};
 };
 
-inline void BiquadFilter::setNotchFrequency(float sinOmega, float cosOmega, float weight)
+inline void BiquadFilter::setLowPassFrequency(float frequency, float weight)
 {
     _weight = weight;
 
-    const float alpha = sinOmega / (2.0F * _Q);
+    const float omega = 2.0F * static_cast<float>(M_PI) * frequency * static_cast<float>(_loopTimeUs) * 0.000001F;
+    const float cosOmega = cosf(omega);
+    const float alpha = sinf(omega) / (2.0F * _Q);
     const float a0reciprocal = 1.0F / (1.0F + alpha);
-    _b0 = a0reciprocal;
-    _b2 = a0reciprocal;
-    _b1 = -2.0F*cosOmega*a0reciprocal;
-    _a1 = _b1;
+
+    _b1 = (1.0F - cosOmega)*a0reciprocal;
+    _b0 = _b1 * 0.5F;
+    _b2 = _b0;
+    _a1 = (-2.0F * cosOmega)*a0reciprocal;
     _a2 = (1.0F - alpha)*a0reciprocal;
 }
 
@@ -370,9 +393,24 @@ inline void BiquadFilter::setNotchFrequency(float frequency, float weight)
     const float cosOmega = cosf(omega);
     const float alpha = sinf(omega) / (2.0F * _Q);
     const float a0reciprocal = 1.0F / (1.0F + alpha);
+
     _b0 = a0reciprocal;
-    _b1 = -2.0F*cosOmega*a0reciprocal;
     _b2 = a0reciprocal;
-    _a1 = _b1*a0reciprocal;
+    _b1 = -2.0F*cosOmega*a0reciprocal;
+    _a1 = _b1;
+    _a2 = (1.0F - alpha)*a0reciprocal;
+}
+
+inline void BiquadFilter::setNotchFrequency(float sinOmega, float cosOmega, float weight)
+{
+    _weight = weight;
+
+    const float alpha = sinOmega / (2.0F * _Q);
+    const float a0reciprocal = 1.0F / (1.0F + alpha);
+
+    _b0 = a0reciprocal;
+    _b2 = a0reciprocal;
+    _b1 = -2.0F*cosOmega*a0reciprocal;
+    _a1 = _b1;
     _a2 = (1.0F - alpha)*a0reciprocal;
 }

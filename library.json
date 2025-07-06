@@ -1,6 +1,6 @@
 {
     "name": "Filters",
-    "description": "Filters library, including IIR, FIR, moving average, and low-pass filters",
+    "description": "Filters library, including IIR, FIR, moving average, low-pass, and notch filters",
     "keywords": "filter IIR FIR moving average exponential low-pass",
     "authors": {
         "name": "Martin Budden",
@@ -11,7 +11,7 @@
         "url": "https://github.com/martinbudden/Library-Filters.git"
     },
     "license": "MIT",
-    "version": "0.5.2",
+    "version": "0.6.0",
     "frameworks": "*",
     "platforms": "*",
     "headers": [ "Filters.h", "RollingBuffer.h" ]
