@@ -322,7 +322,7 @@ public:
         reset();
     }
 
-    inline float calculateOmega(float frequency) const { return 2.0F * static_cast<float>(M_PI) * frequency * _loopTimeUs * 0.000001f; }
+    inline float calculateOmega(float frequency) const { return 2.0F * static_cast<float>(M_PI) * frequency * static_cast<float>(_loopTimeUs) * 0.000001F; }
     void setNotchFrequency(float frequency, float weight);
     void setNotchFrequency(float sinOmega, float cosOmega, float weight);
 
@@ -366,7 +366,7 @@ inline void BiquadFilter::setNotchFrequency(float frequency, float weight)
 {
     _weight = weight;
 
-    const float omega = 2.0F * static_cast<float>(M_PI) * frequency * _loopTimeUs * 0.000001f;
+    const float omega = 2.0F * static_cast<float>(M_PI) * frequency * static_cast<float>(_loopTimeUs) * 0.000001F;
     const float cosOmega = cosf(omega);
     const float alpha = sinf(omega) / (2.0F * _Q);
     const float a0reciprocal = 1.0F / (1.0F + alpha);
