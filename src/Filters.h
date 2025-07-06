@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 
 /*!
 Null filter.
@@ -277,3 +278,101 @@ protected:
     float _state1;
     float _state2;
 };
+
+/*!
+Biquad filter, see https://en.wikipedia.org/wiki/Digital_biquad_filter
+*/
+class BiquadFilter {
+public:
+    BiquadFilter(float a1, float a2, float b0, float b1, float b2) :
+        _a1(a1), _a2(a2),
+        _b0(b0), _b1(b1), _b2(b2)
+        {}
+    BiquadFilter() : BiquadFilter(0.0F, 0.0F, 0.0F, 0.0F, 0.0F) {}
+public:
+    void setParameters(const BiquadFilter& other) {
+        _a1 = other._a1;
+        _a2 = other._a2;
+        _b0 = other._b0;
+        _b1 = other._b1;
+        _b2 = other._b2;
+        _weight = other._weight;
+    }
+
+    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+
+    inline float update(float input) {
+        const float output = _b0*input + _b1*_x1 + _b2*_x2 - _a1*_y1 - _a2*_y2;
+        _x2 = _x1;
+        _x1 = input;
+        _y2 = _y1;
+        _y1 = output;
+        return output;
+    }
+
+    inline float updateWeighted(float input) {
+        const float output = update(input);
+        return _weight*(output - input) + input;
+    }
+
+    inline void initNotch(float frequency, uint32_t loopTimeUs, float Q) {
+        _loopTimeUs = loopTimeUs;
+        _Q = Q;
+        setNotchFrequency(frequency, 0.0F);
+        reset();
+    }
+
+    inline float calculateOmega(float frequency) const { return 2.0F * static_cast<float>(M_PI) * frequency * _loopTimeUs * 0.000001f; }
+    void setNotchFrequency(float frequency, float weight);
+    void setNotchFrequency(float sinOmega, float cosOmega, float weight);
+
+    static float calculateQ(float centerFrequency, float lowerCutoffFrequency) {
+        return centerFrequency*lowerCutoffFrequency / (centerFrequency*centerFrequency - lowerCutoffFrequency*lowerCutoffFrequency);
+    }
+    void setQ(float centerFrequency, float lowerCutoffFrequency) { _Q = calculateQ(centerFrequency, lowerCutoffFrequency); }
+    void setQ(float Q) { _Q = Q; }
+    void setLoopTime(uint32_t loopTimeUs) { _loopTimeUs = loopTimeUs; }
+protected:
+    float _a1;
+    float _a2;
+    float _b0;
+    float _b1;
+    float _b2;
+
+    float _x1 {0.0F};
+    float _x2 {0.0F};
+    float _y1 {0.0F};
+    float _y2 {0.0F};
+
+    float _Q {0.0F};
+    float _weight {0.0F};
+    uint32_t _loopTimeUs {0};
+};
+
+inline void BiquadFilter::setNotchFrequency(float sinOmega, float cosOmega, float weight)
+{
+    _weight = weight;
+
+    const float alpha = sinOmega / (2.0F * _Q);
+    const float a0reciprocal = 1.0F / (1.0F + alpha);
+    _b0 = a0reciprocal;
+    _b2 = a0reciprocal;
+    _b1 = -2.0F*cosOmega*a0reciprocal;
+    _a1 = _b1;
+    _a2 = (1.0F - alpha)*a0reciprocal;
+}
+
+inline void BiquadFilter::setNotchFrequency(float frequency, float weight)
+{
+    _weight = weight;
+
+    const float omega = 2.0F * static_cast<float>(M_PI) * frequency * _loopTimeUs * 0.000001f;
+    const float cosOmega = cosf(omega);
+    const float alpha = sinf(omega) / (2.0F * _Q);
+    const float a0reciprocal = 1.0F / (1.0F + alpha);
+    _b0 = a0reciprocal;
+    _b1 = -2.0F*cosOmega*a0reciprocal;
+    _b2 = a0reciprocal;
+    _a1 = _b1*a0reciprocal;
+    _a2 = (1.0F - alpha)*a0reciprocal;
+}

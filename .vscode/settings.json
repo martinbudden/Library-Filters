@@ -3,6 +3,7 @@
         "AHRS",
         "altera",
         "astextplain",
+        "Biquad",
         "Budden",
         "bugprone",
         "clangtidy",
