@@ -30,6 +30,7 @@
         "Wpadded",
         "Wshadow",
         "Wsign",
+        "Wstrict",
         "Wtrampolines"
     ]
 }
