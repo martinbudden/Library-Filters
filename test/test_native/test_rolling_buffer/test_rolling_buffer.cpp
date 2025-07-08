@@ -416,11 +416,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
     UNITY_BEGIN();
 
-    //RUN_TEST(test_rolling_buffer_size);
-    //RUN_TEST(test_rolling_buffer_front_back);
-    //RUN_TEST(test_rolling_buffer_iteration);
+    RUN_TEST(test_rolling_buffer_size);
+    RUN_TEST(test_rolling_buffer_front_back);
+    RUN_TEST(test_rolling_buffer_iteration);
     RUN_TEST(test_rolling_buffer_copy);
-    //RUN_TEST(test_rolling_buffer_sum);
+    RUN_TEST(test_rolling_buffer_sum);
 
     UNITY_END();
 }

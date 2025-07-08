@@ -254,12 +254,12 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
     UNITY_BEGIN();
 
     RUN_TEST(test_null_filter);
-    /*RUN_TEST(test_moving_average_filter);
+    RUN_TEST(test_moving_average_filter);
     RUN_TEST(test_IIR_filter);
     RUN_TEST(test_power_transfer_filter1);
     RUN_TEST(test_power_transfer_filter2);
     RUN_TEST(test_power_transfer_filter3);
-    RUN_TEST(test_iir_filter);*/
+    RUN_TEST(test_iir_filter);
     RUN_TEST(test_biquad_filter);
 
     UNITY_END();
