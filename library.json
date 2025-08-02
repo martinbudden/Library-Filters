@@ -11,8 +11,8 @@
         "url": "https://github.com/martinbudden/Library-Filters.git"
     },
     "license": "MIT",
-    "version": "0.6.1",
+    "version": "0.7.0",
     "frameworks": "*",
     "platforms": "*",
-    "headers": [ "Filters.h", "RollingBuffer.h" ]
+    "headers": [ "Filters.h", "CircularBuffer.h", "RollingBuffer.h" ]
 }

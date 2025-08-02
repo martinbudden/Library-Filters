@@ -17,7 +17,8 @@ private:
     enum { CAPACITY = C };
 public:
     inline size_t size() const { return _size; }
-    void push_back(const T& value);
+    inline bool isEmpty() const { return _size == 0; }
+    void pushBack(const T& value);
     inline const T& operator[](size_t index) const {
         size_t pos = _begin + index;
         if (pos > capacity()) {
@@ -55,14 +56,14 @@ public:
     const Iterator begin() const { return Iterator(*this, _begin); }
     const Iterator end() const { return Iterator(*this, _end); }
 private:
-    size_t _begin; //!< The virtual beginning of the circular buffer.
-    size_t _end;   //!< The virtual end of the circular buffer (one behind the last element).
-    size_t _size;  //!< The number of items in the circular buffer.
+    size_t _begin; //!< The virtual beginning of the rolling buffer.
+    size_t _end;   //!< The virtual end of the rolling buffer (one behind the last element).
+    size_t _size;  //!< The number of items in the rolling buffer.
     T _buffer[CAPACITY + 1] {}; // need one spare empty cell so we can avoid _end == _begin when full
 };
 
 template <typename T, size_t C>
-void RollingBuffer<T, C>::push_back(const T& value)
+void RollingBuffer<T, C>::pushBack(const T& value)
 {
     _buffer[_end] = value; // sizeof(_buffer) = CAPACITY + 1, so always OK to store value at _end
     ++_end;
@@ -96,7 +97,7 @@ private:
     enum { CAPACITY = C };
 public:
     inline size_t size() const { return _size; }
-    void push_back(const T& value);
+    void pushBack(const T& value);
     inline const T& operator[](size_t index) const {
         size_t pos = _begin + index;
         if (pos > capacity()) {
@@ -133,15 +134,15 @@ public:
     const Iterator begin() const { return Iterator(*this, _begin); }
     const Iterator end() const { return Iterator(*this, _end); }
 private:
-    size_t _begin; //!< The virtual beginning of the circular buffer.
-    size_t _end;   //!< The virtual end of the circular buffer (one behind the last element).
-    size_t _size;  //!< The number of items in the circular buffer.
+    size_t _begin; //!< The virtual beginning of the rolling buffer.
+    size_t _end;   //!< The virtual end of the rolling buffer (one behind the last element).
+    size_t _size;  //!< The number of items in the rolling buffer.
     T _sum {};
     T _buffer[CAPACITY + 1] {}; // need one spare empty cell so we can avoid _end == _begin when full
 };
 
 template <typename T, size_t C>
-void RollingBufferWithSum<T, C>::push_back(const T& value)
+void RollingBufferWithSum<T, C>::pushBack(const T& value)
 {
     _sum += value;
     _buffer[_end] = value; // sizeof(_buffer) = CAPACITY + 1, so always OK to store value at _end

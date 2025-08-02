@@ -387,7 +387,7 @@ protected:
     float _y1 {0.0F};
     float _y2 {0.0F};
 
-    float _2Q_reciprocal {1.0F}; // store 2*Q, since that is what is used in calculations
+    float _2Q_reciprocal {1.0F}; // store 1/(2*Q), since that is what is used in setNotchFrequency calculations
     float _2PiLoopTimeSeconds {0.0F}; // store 2*PI*loopTimeSeconds, since that is what is used in calculations
 };
 
