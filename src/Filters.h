@@ -6,11 +6,19 @@
 #include <cstdint>
 
 /*!
+Filter abstract base class.
+*/
+class FilterBase {
+public:
+    virtual float filterVirtual(float input) = 0;
+};
+
+/*!
 Null filter.
 */
-class FilterNull {
+class FilterNull : public FilterBase {
 public:
-    FilterNull() {}
+    FilterNull() = default;
 public:
     inline void init(float k) { (void)k; }
     inline void reset() {}
@@ -19,6 +27,7 @@ public:
     inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { (void)cutoffFrequency; (void)dT; }
     inline float filter(float input) { return input; }
     inline float filter(float input, float dT) { (void)dT; return input; }
+    virtual float filterVirtual(float input) override { return filter(input); }
 };
 
 
@@ -27,13 +36,14 @@ Simple moving average filter.
 See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
 */
 template <size_t N>
-class FilterMovingAverage {
+class FilterMovingAverage : public FilterBase {
 public:
     FilterMovingAverage() {} // cppcheck-suppress uninitMemberVar
 public:
     inline void reset() { _sum = 0.0F; _count = 0; _index = 0;}
     inline float filter(float input);
     inline float filter(float input, float dT) { (void)dT; return filter(input); }
+    virtual float filterVirtual(float input) override { return filter(input); }
 protected:
     size_t _count {0};
     size_t _index {0};
@@ -65,10 +75,11 @@ inline float FilterMovingAverage<N>::filter(float input)
 Finite Impulse Response (FIR) Filter
 */
 template <size_t N>
-class FIR_filter {
+class FIR_filter : public FilterBase {
 public:
     explicit FIR_filter(const float* coefficients) : _coefficients(coefficients), _back(0) { memset(_buffer, 0, sizeof(_buffer)); }
     inline float filter(float input);
+    virtual float filterVirtual(float input) override { return filter(input); }
 private:
     enum { ORDER = N };
 protected:
@@ -101,7 +112,7 @@ inline float FIR_filter<N>::filter(float input) {
 }
 
 
-class ButterWorthFilter {
+class ButterWorthFilter : public FilterBase {
 public:
     ButterWorthFilter(float a1, float a2, float b0, float b1, float b2) : 
         _a1(a1), _a2(a2), 
@@ -129,6 +140,7 @@ public:
         _x1 = input;
         return output;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
 protected:
     float _a1;
     float _a2;
@@ -148,7 +160,7 @@ Infinite Impulse Response (IIR) Filter.
 Also known as Exponential Moving Average (EMA) Filter.
 See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 */
-class IIR_filter {
+class IIR_filter : public FilterBase {
 public:
     explicit IIR_filter(float frequencyCutoff) :
         _alpha(0.0F),
@@ -178,6 +190,7 @@ public:
         _state += _alpha*(input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
         return _state;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
 protected:
     static constexpr float PI_F = 3.141592653589793F;
     float _alpha;
@@ -189,7 +202,7 @@ protected:
 /*!
 First order power transfer filter
 */
-class PowerTransferFilter1 {
+class PowerTransferFilter1 : public FilterBase {
 public:
     explicit PowerTransferFilter1(float k) : _k(k), _state(0.0F) {}
     PowerTransferFilter1() : PowerTransferFilter1(1.0F) {}
@@ -202,6 +215,7 @@ public:
         _state += _k*(input - _state);
         return _state;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     // Calculates filter gain based on delay (time constant of filter) - time it takes for filter response to reach 63.2% of a step input.
@@ -224,7 +238,7 @@ protected:
 /*!
 Second order power transfer filter
 */
-class PowerTransferFilter2 {
+class PowerTransferFilter2 : public FilterBase {
 public:
     explicit PowerTransferFilter2(float k) : _k(k), _state0(0.0F), _state1(0.0F) {}
     PowerTransferFilter2() : PowerTransferFilter2(1.0F) {}
@@ -238,6 +252,7 @@ public:
         _state0 += _k*(_state1 - _state0);
         return _state0;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     static inline float gainFromDelay(float delay, float dT) {
@@ -262,7 +277,7 @@ protected:
 /*!
 Third order power transfer filter
 */
-class PowerTransferFilter3 {
+class PowerTransferFilter3 : public FilterBase {
 public:
     explicit PowerTransferFilter3(float k) : _k(k), _state0(0.0F), _state1(0.0F), _state2(0.0F) {}
     PowerTransferFilter3() : PowerTransferFilter3(1.0F) {}
@@ -277,6 +292,7 @@ public:
         _state0 += _k*(_state1 - _state0);
         return _state0;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
     inline void setCutoffFrequency(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequency, float dT) { _k = gain(cutoffFrequency, dT); reset(); }
     static inline float gainFromDelay(float delay, float dT) {
@@ -304,7 +320,7 @@ Biquad filter, see https://en.wikipedia.org/wiki/Digital_biquad_filter
 Has additional `_weight` member data, which allows the filter to combine input and output using `filterWeighted()` function.
 `_weight` is ignored when using `filter()` function.
 */
-class BiquadFilter {
+class BiquadFilter : public FilterBase {
 public:
     BiquadFilter(float a1, float a2, float b0, float b1, float b2) :
         _weight(1.0F),
@@ -346,6 +362,7 @@ public:
         _y1 = output;
         return output;
     }
+    virtual float filterVirtual(float input) override { return filter(input); }
 
     inline float filterWeighted(float input) {
         const float output = filter(input);
@@ -353,18 +370,36 @@ public:
         return _weight*(output - input) + input;
     }
 
+    inline void initLowPass(float frequency, uint32_t loopTimeUs, float Q) {
+        assert(Q!=0.0F && "Q cannot be zero");
+        setLoopTime(loopTimeUs);
+        setQ(Q);
+        setLowPassFrequency(frequency);
+        reset();
+    }
     inline void initNotch(float frequency, uint32_t loopTimeUs, float Q) {
         assert(Q!=0.0F && "Q cannot be zero");
         setLoopTime(loopTimeUs);
         setQ(Q);
-        setNotchFrequency(frequency, 0.0F);
+        setNotchFrequency(frequency);
         reset();
     }
 
     inline float calculateOmega(float frequency) const { return frequency*_2PiLoopTimeSeconds; }
-    void setLowPassFrequency(float frequency, float weight);
-    inline void setNotchFrequency(float frequency, float weight);
-    inline void setNotchFrequency(float sinOmega, float two_cosOmega, float weight);
+
+    void setLowPassFrequencyWeighted(float frequency, float weight);
+    void setLowPassFrequency(float frequency) { setLowPassFrequencyWeighted(frequency, 1.0F); }
+
+    inline void setNotchFrequencyWeighted(float frequency, float weight); // assumes Q already set
+    inline void setNotchFrequency(float frequency) {setNotchFrequencyWeighted(frequency, 1.0F); } // assumes Q already set
+    inline void setNotchFrequencyWeighted(float sinOmega, float two_cosOmega, float weight);
+    inline void setNotchFrequency(float centerFrequency, float lowerCutoffFrequency) {
+        setQ(calculateQ(centerFrequency, lowerCutoffFrequency));
+        setNotchFrequency(centerFrequency);
+    }
+    inline void setNotchFrequency(uint16_t centerFrequency, uint16_t lowerCutoffFrequency) {
+        setNotchFrequency(static_cast<float>(centerFrequency), static_cast<float>(lowerCutoffFrequency));
+    }
 
     static float calculateQ(float centerFrequency, float lowerCutoffFrequency) {
         return centerFrequency*lowerCutoffFrequency/(centerFrequency*centerFrequency - lowerCutoffFrequency*lowerCutoffFrequency);
@@ -372,6 +407,7 @@ public:
     void setQ(float centerFrequency, float lowerCutoffFrequency) { _2Q_reciprocal = 1.0F/(2.0F*calculateQ(centerFrequency, lowerCutoffFrequency)); }
     void setQ(float Q) { _2Q_reciprocal = 1.0F /(2.0F*Q); }
     float getQ() const { return (1.0F/_2Q_reciprocal)/2.0F; }
+
     void setLoopTime(uint32_t loopTimeUs) { _2PiLoopTimeSeconds = 2.0F*PI_F*static_cast<float>(loopTimeUs)*0.000001F; }
 protected:
     static constexpr float PI_F = 3.141592653589793F;
@@ -391,7 +427,7 @@ protected:
     float _2PiLoopTimeSeconds {0.0F}; // store 2*PI*loopTimeSeconds, since that is what is used in calculations
 };
 
-inline void BiquadFilter::setLowPassFrequency(float frequency, float weight)
+inline void BiquadFilter::setLowPassFrequencyWeighted(float frequency, float weight)
 {
     _weight = weight;
 
@@ -407,7 +443,7 @@ inline void BiquadFilter::setLowPassFrequency(float frequency, float weight)
     _a2 = (1.0F - alpha)*a0reciprocal;
 }
 
-inline void BiquadFilter::setNotchFrequency(float frequency, float weight)
+inline void BiquadFilter::setNotchFrequencyWeighted(float frequency, float weight)
 {
     _weight = weight;
 
@@ -423,7 +459,7 @@ inline void BiquadFilter::setNotchFrequency(float frequency, float weight)
     _a2 = (1.0F - alpha)*a0reciprocal;
 }
 
-inline void BiquadFilter::setNotchFrequency(float sinOmega, float two_cosOmega, float weight)
+inline void BiquadFilter::setNotchFrequencyWeighted(float sinOmega, float two_cosOmega, float weight)
 {
     _weight = weight;
 

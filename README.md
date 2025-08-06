@@ -11,10 +11,14 @@ This library contains a collection of filter classes. They have been developed f
 
 ## Class Diagram
 
-The filters are somewhat statically (build-time) polymorphic, but not dynamically (run-time) polymorphic.<br>
+The filters are somewhat statically (build-time) polymorphic, and somewhat dynamically (run-time) polymorphic.<br>
 This is deliberate.<br>
-The filters have functions that have names and signatures in common, but these functions are not virtual.<br>
-This means the the filters are somewhat interchangeable at build time, depending on which functions are used
+
+The filters have functions that have names and signatures in common, but the only virtual function is `filterVirtual`.
+
+The filter function may called directly by calling `filter`, or indirectly (via the vtable) using `filterVirtual`.
+
+This means the the filters are somewhat interchangeable at build time, depending on which functions are used.
 
 ```mermaid
 classDiagram

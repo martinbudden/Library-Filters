@@ -15,6 +15,7 @@
         "pioenvs",
         "suppr",
         "unflags",
+        "vtable",
         "Wattributes",
         "Wcast",
         "Wdisabled",
