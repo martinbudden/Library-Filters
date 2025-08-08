@@ -116,7 +116,7 @@ classDiagram
         filter(float input) float
         filterWeighted(float input) float
 
-        initNotch(float frequency, uint32_t loopTimeUs, float Q)
+        initNotch(float frequency, float loopTimeSeconds, float Q)
 
         calculateOmega(float frequency) float
         setLowPassFrequency(float frequency, float weight)
@@ -127,6 +127,6 @@ classDiagram
         setQ(float centerFrequency, float lowerCutoffFrequency)
         setQ(float Q)
         getQ() float
-        setLoopTime(uint32_t loopTimeUs)
+        setLoopTime(float loopTimeSeconds)
     }
 ```

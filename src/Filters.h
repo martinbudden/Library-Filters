@@ -370,16 +370,16 @@ public:
         return _weight*(output - input) + input;
     }
 
-    inline void initLowPass(float frequency, uint32_t loopTimeUs, float Q) {
+    inline void initLowPass(float frequency, float loopTimeSeconds, float Q) {
         assert(Q!=0.0F && "Q cannot be zero");
-        setLoopTime(loopTimeUs);
+        setLoopTime(loopTimeSeconds);
         setQ(Q);
         setLowPassFrequency(frequency);
         reset();
     }
-    inline void initNotch(float frequency, uint32_t loopTimeUs, float Q) {
+    inline void initNotch(float frequency, float loopTimeSeconds, float Q) {
         assert(Q!=0.0F && "Q cannot be zero");
-        setLoopTime(loopTimeUs);
+        setLoopTime(loopTimeSeconds);
         setQ(Q);
         setNotchFrequency(frequency);
         reset();
@@ -408,7 +408,7 @@ public:
     void setQ(float Q) { _2Q_reciprocal = 1.0F /(2.0F*Q); }
     float getQ() const { return (1.0F/_2Q_reciprocal)/2.0F; }
 
-    void setLoopTime(uint32_t loopTimeUs) { _2PiLoopTimeSeconds = 2.0F*PI_F*static_cast<float>(loopTimeUs)*0.000001F; }
+    void setLoopTime(float loopTimeSeconds) { _2PiLoopTimeSeconds = 2.0F*PI_F*loopTimeSeconds; }
 protected:
     static constexpr float PI_F = 3.141592653589793F;
     float _weight {1.0F}; //<! weight of 1.0 gives just output, weight of 0.0 gives just input
