@@ -124,6 +124,7 @@ void test_power_transfer_filter1()
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, filter.filter(-1.0F));
 
     filter.reset();
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, filter.getState());
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
     filter.reset();

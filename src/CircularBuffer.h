@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstring>
-#include <stddef.h>
 
 
 /*!
@@ -61,7 +61,7 @@ private:
     size_t _begin; //!< The virtual beginning of the circular buffer.
     size_t _end;   //!< The virtual end of the circular buffer (one behind the last element).
     size_t _size;  //!< The number of items in the circular buffer.
-    T _buffer[CAPACITY + 1] {}; // need one spare empty cell so we can avoid _end == _begin when full
+    std::array<T, CAPACITY + 1> _buffer {}; // need one spare empty cell so we can avoid _end == _begin when full
 };
 
 template <typename T, size_t C>
