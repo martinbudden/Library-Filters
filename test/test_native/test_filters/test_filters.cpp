@@ -39,6 +39,13 @@ void test_moving_average_filter()
 class IIR_filter_test : public IIR_filter
 {
 public:
+    virtual ~IIR_filter_test() = default;
+    // class is not copyable or moveable
+    IIR_filter_test(const IIR_filter_test&) = delete;
+    IIR_filter_test& operator=(const IIR_filter_test&) = delete;
+    IIR_filter_test(IIR_filter_test&&) = delete;
+    IIR_filter_test& operator=(IIR_filter_test&&) = delete;
+
     explicit IIR_filter_test(float tau) : IIR_filter(tau) {}
     IIR_filter_test(float frequencyCutoff, float dT) : IIR_filter(frequencyCutoff, dT) {}
 
