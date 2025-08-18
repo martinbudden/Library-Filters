@@ -16,6 +16,7 @@ protected:
     static constexpr float PI_F = static_cast<float>(M_PI);
 };
 
+
 /*!
 Null filter.
 */
@@ -31,178 +32,7 @@ public:
 
     inline float filter(float input) { return input; }
     inline float filter(float input, float dT) { (void)dT; return input; }
-    virtual float filterVirtual(float input) override;
-};
-
-
-/*!
-Simple moving average filter.
-See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
-*/
-template <size_t N>
-class FilterMovingAverage : public FilterBase {
-public:
-    FilterMovingAverage() {} // cppcheck-suppress uninitMemberVar
-public:
-    inline void reset() { _sum = 0.0F; _count = 0; _index = 0;}
-
-    inline float filter(float input);
-    inline float filter(float input, float dT) { (void)dT; return filter(input); }
-    virtual float filterVirtual(float input) override;
-protected:
-    size_t _count {0};
-    size_t _index {0};
-    float _sum {0};
-    float _samples[N];
-};
-
-template <size_t N>
-inline float FilterMovingAverage<N>::filter(float input)
-{
-    _sum += input;
-    if (_count < N) {
-        _samples[_index++] = input;
-        ++_count;
-        return _sum/static_cast<float>(_count);
-    } else {
-        if (_index == N) {
-            _index = 0;
-        }
-        _sum -= _samples[_index];
-        _samples[_index++] = input;
-    }
-    constexpr float nReciprocal = 1.0F/N;
-    return _sum*nReciprocal;
-}
-
-
-/*!
-Finite Impulse Response (FIR) Filter
-*/
-template <size_t N>
-class FIR_filter : public FilterBase {
-public:
-    explicit FIR_filter(const float* coefficients) : _coefficients(coefficients), _back(0) { memset(_buffer, 0, sizeof(_buffer)); }
-
-    inline float filter(float input);
-    virtual float filterVirtual(float input) override;
-private:
-    enum { ORDER = N };
-protected:
-    const float* _coefficients;
-    std::array<float, ORDER> _buffer;
-    size_t _back;  //!< The virtual end of the circular buffer (one behind the last element).
-};
-
-template <size_t N>
-inline float FIR_filter<N>::filter(float input) {
-    auto index = _back;
-
-    // Add the input value to the back of the circular buffer
-    _buffer[_back] = input;
-    ++_back;
-    if (_back == ORDER) {
-        _back = 0;
-    }
-
-    float output = 0.0F;
-    for (auto ii = 0; ii < ORDER; ++ii) {
-        output += _coefficients[ii]*_buffer[index];
-        if (index == 0) {
-            index = ORDER;
-        }
-        --index;
-    }
-
-    return output;
-}
-
-
-class ButterWorthFilter : public FilterBase {
-public:
-    ButterWorthFilter(float a1, float a2, float b0, float b1, float b2) : 
-        _a1(a1), _a2(a2), 
-        _b0(b0), _b1(b1), _b2(b2), 
-        _x1(0.0F), _x2(0.0F), 
-        _y1(0.0F), _y2(0.0F)
-        {}
-    ButterWorthFilter() : ButterWorthFilter(0.0F, 0.0F, 1.0F, 0.0F, 0.0F) {}
-    //! Copy parameters from another ButterWorthFilter filter
-    inline void setParameters(const ButterWorthFilter& other) {
-        _a1 = other._a1;
-        _a2 = other._a2;
-        _b0 = other._b0;
-        _b1 = other._b1;
-        _b2 = other._b2;
-    }
-
-    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
-    inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F; reset(); }
-
-    inline float filter(float input) {
-        const float output = _b0*input - _a2*_y2 + _b1*_x1 + _b2*_x2 - _a1*_y1;
-        _y2 = _y1;
-        _y1 = output;
-        _x2 = _x1;
-        _x1 = input;
-        return output;
-    }
-    virtual float filterVirtual(float input) override;
-protected:
-    float _a1;
-    float _a2;
-    float _b0;
-    float _b1;
-    float _b2;
-
-    float _x1;
-    float _x2;
-    float _y1;
-    float _y2;
-};
-
-
-/*!
-Infinite Impulse Response (IIR) Filter.
-Also known as Exponential Moving Average (EMA) Filter.
-See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
-*/
-class IIR_filter : public FilterBase {
-public:
-    explicit IIR_filter(float cutoffFrequencyHz) :
-        _alpha(0.0F),
-        _omega(2.0F*PI_F*cutoffFrequencyHz),
-        _state(0.0F)
-        {}
-    IIR_filter(float cutoffFrequencyHz, float dT): _state(0.0F) {
-        setCutoffFrequency(cutoffFrequencyHz, dT);
-    }
-    IIR_filter() : _alpha(1.0F), _omega(0.0F), _state(0.0F) {}
-public:
-    inline void init(float alpha) { _alpha = alpha; _state = 0.0F; }
-    inline void reset() { _state = 0.0F; }
-    inline void setToPassthrough() { _alpha = 1.0F; reset(); }
-    inline void setAlpha(float alpha) { _alpha = alpha; }
-    inline void setCutoffFrequency(float cutoffFrequencyHz, float dT) {
-        _omega = 2.0F*PI_F*cutoffFrequencyHz;
-        _alpha = _omega*dT/(_omega*dT + 1.0F);
-    }
-    inline void setCutoffFrequencyAndReset(float cutoffFrequencyHz, float dT) { setCutoffFrequency(cutoffFrequencyHz, dT); reset(); }
-
-    inline float filter(float input, float dT) { // Variable dT IIR_filter filter;
-        const float alpha = _omega*dT/(_omega*dT + 1.0F);
-        _state += alpha*(input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
-        return _state;
-    }
-    inline float filter(float input) { // Constant dT IIR_filter filter
-        _state += _alpha*(input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
-        return _state;
-    }
-    virtual float filterVirtual(float input) override;
-protected:
-    float _alpha;
-    float _omega;
-    float _state;
+    virtual float filterVirtual(float input) override { return filter(input); }
 };
 
 
@@ -223,7 +53,7 @@ public:
         _state += _k*(input - _state); // equivalent to _state = _k*input + (1.0F - _k)*_state;
         return _state;
     }
-    virtual float filterVirtual(float input) override;
+    virtual float filterVirtual(float input) override { return filter(input); }
 
     inline void setCutoffFrequency(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); reset(); }
@@ -263,7 +93,7 @@ public:
         _state[0] += _k*(_state[1] - _state[0]);
         return _state[0];
     }
-    virtual float filterVirtual(float input) override;
+    virtual float filterVirtual(float input) override { return filter(input); }
 
     inline void setCutoffFrequency(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); reset(); }
@@ -303,7 +133,7 @@ public:
         _state[0] += _k*(_state[1] - _state[0]);
         return _state[0];
     }
-    virtual float filterVirtual(float input) override;
+    virtual float filterVirtual(float input) override { return filter(input); }
 
     inline void setCutoffFrequency(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); }
     inline void setCutoffFrequencyAndReset(float cutoffFrequencyHz, float dT) { _k = gainFromFrequency(cutoffFrequencyHz, dT); reset(); }
@@ -322,6 +152,7 @@ protected:
     float _k;
     std::array<float, 3> _state {};
 };
+
 
 /*!
 Biquad filter, see https://en.wikipedia.org/wiki/Digital_biquad_filter
@@ -378,7 +209,7 @@ public:
         _y1 = output;
         return output;
     }
-    virtual float filterVirtual(float input) override;
+    virtual float filterVirtual(float input) override { return filter(input); }
 
     inline float filterWeighted(float input) {
         const float output = filter(input);
@@ -498,3 +329,174 @@ inline void BiquadFilter::setNotchFrequencyWeighted(float sinOmega, float two_co
     _a1 = _b1;
     _a2 = (1.0F - alpha)*a0reciprocal;
 }
+
+
+/*!
+Simple moving average filter.
+See [Moving Average Filter - Theory and Software Implementation - Phil's Lab #21](https://www.youtube.com/watch?v=rttn46_Y3c8).
+*/
+template <size_t N>
+class FilterMovingAverage : public FilterBase {
+public:
+    FilterMovingAverage() {} // cppcheck-suppress uninitMemberVar
+public:
+    inline void reset() { _sum = 0.0F; _count = 0; _index = 0;}
+
+    inline float filter(float input);
+    inline float filter(float input, float dT) { (void)dT; return filter(input); }
+    virtual float filterVirtual(float input) override { return filter(input); }
+protected:
+    size_t _count {0};
+    size_t _index {0};
+    float _sum {0};
+    float _samples[N];
+};
+
+template <size_t N>
+inline float FilterMovingAverage<N>::filter(float input)
+{
+    _sum += input;
+    if (_count < N) {
+        _samples[_index++] = input;
+        ++_count;
+        return _sum/static_cast<float>(_count);
+    } else {
+        if (_index == N) {
+            _index = 0;
+        }
+        _sum -= _samples[_index];
+        _samples[_index++] = input;
+    }
+    constexpr float nReciprocal = 1.0F/N;
+    return _sum*nReciprocal;
+}
+
+
+/*!
+Finite Impulse Response (FIR) Filter
+*/
+template <size_t N>
+class FIR_filter : public FilterBase {
+public:
+    explicit FIR_filter(const float* coefficients) : _coefficients(coefficients), _back(0) { memset(_buffer, 0, sizeof(_buffer)); }
+
+    inline float filter(float input);
+    virtual float filterVirtual(float input) override { return filter(input); }
+private:
+    enum { ORDER = N };
+protected:
+    const float* _coefficients;
+    std::array<float, ORDER> _buffer;
+    size_t _back;  //!< The virtual end of the circular buffer (one behind the last element).
+};
+
+template <size_t N>
+inline float FIR_filter<N>::filter(float input) {
+    auto index = _back;
+
+    // Add the input value to the back of the circular buffer
+    _buffer[_back] = input;
+    ++_back;
+    if (_back == ORDER) {
+        _back = 0;
+    }
+
+    float output = 0.0F;
+    for (auto ii = 0; ii < ORDER; ++ii) {
+        output += _coefficients[ii]*_buffer[index];
+        if (index == 0) {
+            index = ORDER;
+        }
+        --index;
+    }
+
+    return output;
+}
+
+
+class ButterWorthFilter : public FilterBase {
+public:
+    ButterWorthFilter(float a1, float a2, float b0, float b1, float b2) : 
+        _a1(a1), _a2(a2), 
+        _b0(b0), _b1(b1), _b2(b2), 
+        _x1(0.0F), _x2(0.0F), 
+        _y1(0.0F), _y2(0.0F)
+        {}
+    ButterWorthFilter() : ButterWorthFilter(0.0F, 0.0F, 1.0F, 0.0F, 0.0F) {}
+    //! Copy parameters from another ButterWorthFilter filter
+    inline void setParameters(const ButterWorthFilter& other) {
+        _a1 = other._a1;
+        _a2 = other._a2;
+        _b0 = other._b0;
+        _b1 = other._b1;
+        _b2 = other._b2;
+    }
+
+    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+    inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F; reset(); }
+
+    inline float filter(float input) {
+        const float output = _b0*input - _a2*_y2 + _b1*_x1 + _b2*_x2 - _a1*_y1;
+        _y2 = _y1;
+        _y1 = output;
+        _x2 = _x1;
+        _x1 = input;
+        return output;
+    }
+    virtual float filterVirtual(float input) override { return filter(input); }
+protected:
+    float _a1;
+    float _a2;
+    float _b0;
+    float _b1;
+    float _b2;
+
+    float _x1;
+    float _x2;
+    float _y1;
+    float _y2;
+};
+
+
+/*!
+Infinite Impulse Response (IIR) Filter.
+Also known as Exponential Moving Average (EMA) Filter.
+See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
+*/
+class IIR_filter : public FilterBase {
+public:
+    explicit IIR_filter(float cutoffFrequencyHz) :
+        _alpha(0.0F),
+        _omega(2.0F*PI_F*cutoffFrequencyHz),
+        _state(0.0F)
+        {}
+    IIR_filter(float cutoffFrequencyHz, float dT): _state(0.0F) {
+        setCutoffFrequency(cutoffFrequencyHz, dT);
+    }
+    IIR_filter() : _alpha(1.0F), _omega(0.0F), _state(0.0F) {}
+public:
+    inline void init(float alpha) { _alpha = alpha; _state = 0.0F; }
+    inline void reset() { _state = 0.0F; }
+    inline void setToPassthrough() { _alpha = 1.0F; reset(); }
+    inline void setAlpha(float alpha) { _alpha = alpha; }
+    inline void setCutoffFrequency(float cutoffFrequencyHz, float dT) {
+        _omega = 2.0F*PI_F*cutoffFrequencyHz;
+        _alpha = _omega*dT/(_omega*dT + 1.0F);
+    }
+    inline void setCutoffFrequencyAndReset(float cutoffFrequencyHz, float dT) { setCutoffFrequency(cutoffFrequencyHz, dT); reset(); }
+
+    inline float filter(float input, float dT) { // Variable dT IIR_filter filter;
+        const float alpha = _omega*dT/(_omega*dT + 1.0F);
+        _state += alpha*(input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
+        return _state;
+    }
+    inline float filter(float input) { // Constant dT IIR_filter filter
+        _state += _alpha*(input - _state); // optimized form of _state = alpha*input + (1.0F - alpha)*_state
+        return _state;
+    }
+    virtual float filterVirtual(float input) override { return filter(input); }
+protected:
+    float _alpha;
+    float _omega;
+    float _state;
+};

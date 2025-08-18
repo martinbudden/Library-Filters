@@ -18,6 +18,7 @@ public:
     virtual T filterVirtual(const T& input) = 0;
 };
 
+
 /*!
 Null filter.
 */
@@ -118,6 +119,7 @@ protected:
     std::array<T, 2> _state {};
 };
 
+
 /*!
 Third order power transfer filter
 */
@@ -158,6 +160,7 @@ protected:
     std::array<T, 3> _state {};
 };
 
+
 /*!
 Biquad filter, see https://en.wikipedia.org/wiki/Digital_biquad_filter
 
@@ -179,7 +182,6 @@ public:
         T y1;
         T y2;
     };
-
 public:
     void setWeight(float weight) { _weight = weight; }
     float getWeight() const { return _weight; }
