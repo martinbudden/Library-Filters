@@ -67,7 +67,7 @@ public:
         const float omega = 2.0F*PI_F*cutoffFrequencyHz*dT;
         return omega/(omega + 1.0F);
     }
-    // for testing
+// for testing
     float getState() const { return _state; }
 protected:
     float _k;
@@ -104,8 +104,8 @@ public:
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         return PowerTransferFilter1::gainFromFrequency(cutoffFrequencyHz*cutoffCorrection, dT);
     }
-    // for testing
-    std::array<float, 2> getState() const { return _state; }
+// for testing
+    const std::array<float, 2>& getState() const { return _state; }
 protected:
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
     static constexpr float cutoffCorrection = 1.553773974F;
@@ -144,8 +144,8 @@ public:
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         return PowerTransferFilter1::gainFromFrequency(cutoffFrequencyHz*cutoffCorrection, dT);
     }
-    // for testing
-    std::array<float, 3> getState() const { return _state; }
+// for testing
+    const std::array<float, 3>& getState() const { return _state; }
 protected:
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
     static constexpr float cutoffCorrection = 1.961459177F;
@@ -198,15 +198,15 @@ public:
         _b2 = other._b2;
     }
 
-    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+    inline void reset() { _state.x1 = 0.0F; _state.x2 = 0.0F; _state.y1 = 0.0F; _state.y2 = 0.0F; }
     inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F;  _weight = 1.0F; reset(); }
 
     inline float filter(float input) {
-        const float output = _b0*input + _b1*_x1 + _b2*_x2 - _a1*_y1 - _a2*_y2;
-        _x2 = _x1;
-        _x1 = input;
-        _y2 = _y1;
-        _y1 = output;
+        const float output = _b0*input + _b1*_state.x1 + _b2*_state.x2 - _a1*_state.y1 - _a2*_state.y2;
+        _state.x2 = _state.x1;
+        _state.x1 = input;
+        _state.y2 = _state.y1;
+        _state.y1 = output;
         return output;
     }
     virtual float filterVirtual(float input) override { return filter(input); }
@@ -218,14 +218,14 @@ public:
     }
 
     inline void initLowPass(float frequencyHz, float loopTimeSeconds, float Q) {
-        assert(Q!=0.0F && "Q cannot be zero");
+        assert(Q != 0.0F && "Q cannot be zero");
         setLoopTime(loopTimeSeconds);
         setQ(Q);
         setLowPassFrequency(frequencyHz);
         reset();
     }
     inline void initNotch(float frequencyHz, float loopTimeSeconds, float Q) {
-        assert(Q!=0.0F && "Q cannot be zero");
+        assert(Q != 0.0F && "Q cannot be zero");
         setLoopTime(loopTimeSeconds);
         setQ(Q);
         setNotchFrequency(frequencyHz);
@@ -256,8 +256,8 @@ public:
     float getQ() const { return (1.0F/_2Q_reciprocal)/2.0F; }
 
     void setLoopTime(float loopTimeSeconds) { _2PiLoopTimeSeconds = 2.0F*PI_F*loopTimeSeconds; }
-    // for testing
-    state_t getState() const { return { _x1, _x2, _y1, _y2 }; }
+// for testing
+    const state_t& getState() const { return _state; }
 protected:
     float _weight {1.0F}; //<! weight of 1.0 gives just output, weight of 0.0 gives just input
     float _a1;
@@ -266,10 +266,7 @@ protected:
     float _b1;
     float _b2;
 
-    float _x1 {};
-    float _x2 {};
-    float _y1 {};
-    float _y2 {};
+    state_t _state {};
 
     float _2Q_reciprocal {1.0F}; // store 1/(2*Q), since that is what is used in setNotchFrequency calculations
     float _2PiLoopTimeSeconds {0.0F}; // store 2*PI*loopTimeSeconds, since that is what is used in calculations
@@ -419,10 +416,15 @@ public:
     ButterWorthFilter(float a1, float a2, float b0, float b1, float b2) : 
         _a1(a1), _a2(a2), 
         _b0(b0), _b1(b1), _b2(b2), 
-        _x1(0.0F), _x2(0.0F), 
-        _y1(0.0F), _y2(0.0F)
+        _state { .x1 = 0.0F, .x2 = 0.0F, .y1 = 0.0F, .y2 = 0.0F }
         {}
     ButterWorthFilter() : ButterWorthFilter(0.0F, 0.0F, 1.0F, 0.0F, 0.0F) {}
+    struct state_t {
+        float x1;
+        float x2;
+        float y1;
+        float y2;
+    };
     //! Copy parameters from another ButterWorthFilter filter
     inline void setParameters(const ButterWorthFilter& other) {
         _a1 = other._a1;
@@ -432,15 +434,15 @@ public:
         _b2 = other._b2;
     }
 
-    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+    inline void reset() { _state = { 0.0F, 0.0F, 0.0F, 0.0F }; }
     inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F; reset(); }
 
     inline float filter(float input) {
-        const float output = _b0*input - _a2*_y2 + _b1*_x1 + _b2*_x2 - _a1*_y1;
-        _y2 = _y1;
-        _y1 = output;
-        _x2 = _x1;
-        _x1 = input;
+        const float output = _b0*input - _a2*_state.y2 + _b1*_state.x1 + _b2*_state.x2 - _a1*_state.y1;
+        _state.y2 = _state.y1;
+        _state.y1 = output;
+        _state.x2 = _state.x1;
+        _state.x1 = input;
         return output;
     }
     virtual float filterVirtual(float input) override { return filter(input); }
@@ -451,10 +453,7 @@ protected:
     float _b1;
     float _b2;
 
-    float _x1;
-    float _x2;
-    float _y1;
-    float _y2;
+    state_t _state;
 };
 
 

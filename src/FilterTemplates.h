@@ -71,11 +71,12 @@ public:
         const float omega = 2.0F*PI_F*cutoffFrequencyHz*dT;
         return omega/(omega + 1.0F);
     }
-    // for testing
-    T getState() const { return _state; }
+// for testing
+    const T& getState() const { return _state; }
 protected:
     float _k;
     T _state {};
+protected:
     static constexpr float PI_F = static_cast<float>(M_PI);
 };
 
@@ -110,8 +111,8 @@ public:
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         return PowerTransferFilter1T<T>::gainFromFrequency(cutoffFrequencyHz*cutoffCorrection, dT);
     }
-    // for testing
-    std::array<T, 2> getState() const { return _state; }
+// for testing
+    const std::array<T, 2>& getState() const { return _state; }
 protected:
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
     static constexpr float cutoffCorrection = 1.553773974F;
@@ -151,8 +152,8 @@ public:
         // shift cutoffFrequency to satisfy -3dB cutoff condition
         return PowerTransferFilter1T<T>::gainFromFrequency(cutoffFrequencyHz*cutoffCorrection, dT);
     }
-    // for testing
-    std::array<T, 3> getState() const { return _state; }
+// for testing
+    const std::array<T, 3>& getState() const { return _state; }
 protected:
     // PowerTransferFilter<n> cutoff correction = 1/sqrt(2^(1/n) - 1)
     static constexpr float cutoffCorrection = 1.961459177F;
@@ -206,15 +207,15 @@ public:
         _b2 = other._b2;
     }
 
-    inline void reset() { _x1 = 0.0F; _x2 = 0.0F; _y1 = 0.0F; _y2 = 0.0F; }
+    inline void reset() { _state.x1 = 0.0F; _state.x2 = 0.0F; _state.y1 = 0.0F; _state.y2 = 0.0F; }
     inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F;  _weight = 1.0F; reset(); }
 
     inline T filter(const T& input) {
-        const T output = _b0*input + _b1*_x1 + _b2*_x2 - _a1*_y1 - _a2*_y2;
-        _x2 = _x1;
-        _x1 = input;
-        _y2 = _y1;
-        _y1 = output;
+        const T output = _b0*input + _b1*_state.x1 + _b2*_state.x2 - _a1*_state.y1 - _a2*_state.y2;
+        _state.x2 = _state.x1;
+        _state.x1 = input;
+        _state.y2 = _state.y1;
+        _state.y1 = output;
         return output;
     }
     virtual T filterVirtual(const T& input) override { return filter(input); }
@@ -264,8 +265,8 @@ public:
     float getQ() const { return (1.0F/_2Q_reciprocal)/2.0F; }
 
     void setLoopTime(float loopTimeSeconds) { _2PiLoopTimeSeconds = 2.0F*PI_F*loopTimeSeconds; }
-    // for testing
-    state_t getState() const { return { _x1, _x2, _y1, _y2 }; }
+// for testing
+    const state_t& getState() const { return _state; }
 protected:
     float _weight {1.0F}; //<! weight of 1.0 gives just output, weight of 0.0 gives just input
     float _a1;
@@ -274,13 +275,11 @@ protected:
     float _b1;
     float _b2;
 
-    T _x1 {};
-    T _x2 {};
-    T _y1 {};
-    T _y2 {};
+    state_t _state {};
 
     float _2Q_reciprocal {1.0F}; // store 1/(2*Q), since that is what is used in setNotchFrequency calculations
     float _2PiLoopTimeSeconds {0.0F}; // store 2*PI*loopTimeSeconds, since that is what is used in calculations
+protected:
     static constexpr float PI_F = static_cast<float>(M_PI);
 };
 
