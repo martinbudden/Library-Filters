@@ -280,8 +280,15 @@ inline void BiquadFilter::setLowPassFrequencyWeighted(float frequencyHz, float w
     _weight = weight;
 
     const float omega = frequencyHz*_2PiLoopTimeSeconds;
+#if defined(LIBRARY_FILTERS_USE_SINCOS)
+    float sinOmega {};
+    float cosOmega {};
+    sincosf(omega, &sinOmega, &cosOmega);
+    const float alpha = sinOmega*_2Q_reciprocal;
+#else
     const float cosOmega = cosf(omega);
     const float alpha = sinf(omega)*_2Q_reciprocal;
+#endif
     const float a0reciprocal = 1.0F/(1.0F + alpha);
 
     _b1 = (1.0F - cosOmega)*a0reciprocal;
@@ -299,8 +306,15 @@ inline void BiquadFilter::setNotchFrequencyWeighted(float frequencyHz, float wei
     _weight = weight;
 
     const float omega = frequencyHz*_2PiLoopTimeSeconds;
+#if defined(LIBRARY_FILTERS_USE_SINCOS)
+    float sinOmega {};
+    float cosOmega {};
+    sincosf(omega, &sinOmega, &cosOmega);
+    const float alpha = sinOmega*_2Q_reciprocal;
+#else
     const float cosOmega = cosf(omega);
     const float alpha = sinf(omega)*_2Q_reciprocal;
+#endif
     const float a0reciprocal = 1.0F/(1.0F + alpha);
 
     _b0 = a0reciprocal;
