@@ -11,6 +11,7 @@ Filter abstract base class.
 */
 class FilterBase {
 public:
+    virtual ~FilterBase() = default;
     virtual float filterVirtual(float input) = 0;
 protected:
     static constexpr float PI_F = static_cast<float>(M_PI);

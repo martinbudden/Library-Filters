@@ -15,6 +15,7 @@ Filter abstract base class.
 template <typename T>
 class FilterBaseT {
 public:
+    virtual ~FilterBaseT() = default;
     virtual T filterVirtual(const T& input) = 0;
 };
 
