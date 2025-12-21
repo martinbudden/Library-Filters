@@ -13,8 +13,6 @@ class FilterBase {
 public:
     virtual ~FilterBase() = default;
     virtual float filterVirtual(float input) = 0;
-protected:
-    static constexpr float PI_F = static_cast<float>(M_PI);
 };
 
 
@@ -73,6 +71,8 @@ public:
 protected:
     float _k;
     float _state {};
+protected:
+    static constexpr float PI_F = 3.14159265358979323846F;
 };
 
 
@@ -271,6 +271,8 @@ protected:
 
     float _2Q_reciprocal {1.0F}; // store 1/(2*Q), since that is what is used in setNotchFrequency calculations
     float _2PiLoopTimeSeconds {0.0F}; // store 2*PI*loopTimeSeconds, since that is what is used in calculations
+protected:
+    static constexpr float PI_F = 3.14159265358979323846F;
 };
 
 /*!
@@ -513,4 +515,6 @@ protected:
     float _alpha;
     float _omega;
     float _state;
+protected:
+    static constexpr float PI_F = 3.14159265358979323846F;
 };
