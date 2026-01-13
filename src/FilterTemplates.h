@@ -51,7 +51,7 @@ public:
     PowerTransferFilter1T(float cutoffFrequencyHz, float dT) : PowerTransferFilter1T(gainFromFrequency(cutoffFrequencyHz, dT)) {}
 public:
     inline void init(float k) { _k = k; reset(); }
-    inline void reset() { _state = 0.0F; }
+    inline void reset() { _state = {}; }
     inline void setToPassthrough() { _k = 1.0F; reset(); }
 
     inline T filter(const T& input) {
@@ -93,7 +93,7 @@ public:
     PowerTransferFilter2T(float cutoffFrequencyHz, float dT) : PowerTransferFilter2T(gainFromFrequency(cutoffFrequencyHz, dT)) {}
 public:
     inline void init(float k) { _k = k; reset(); }
-    inline void reset() { _state[0] = 0.0F; _state[1] = 0.0F; }
+    inline void reset() { _state[0] = {}; _state[1] = {}; }
     inline void setToPassthrough() { _k = 1.0F; }
 
     inline T filter(const T& input) {
@@ -133,7 +133,7 @@ public:
     PowerTransferFilter3T(float cutoffFrequencyHz, float dT) : PowerTransferFilter3T(gainFromFrequency(cutoffFrequencyHz, dT)) {}
 public:
     inline void init(float k) { _k = k; reset(); }
-    inline void reset() { _state[0] = 0.0F; _state[1] = 0.0F; _state[2] = 0.0F; }
+    inline void reset() { _state[0] = {}; _state[1] = {}; _state[2] = {}; }
     inline void setToPassthrough() { _k = 1.0F; reset(); }
 
     inline T filter(const T& input) {
@@ -208,7 +208,7 @@ public:
         _b2 = other._b2;
     }
 
-    inline void reset() { _state.x1 = 0.0F; _state.x2 = 0.0F; _state.y1 = 0.0F; _state.y2 = 0.0F; }
+    inline void reset() { _state.x1 = {}; _state.x2 = {}; _state.y1 = {}; _state.y2 = {}; }
     inline void setToPassthrough() { _b0 = 1.0F; _b1 = 0.0F; _b2 = 0.0F; _a1 = 0.0F; _a2 = 0.0F;  _weight = 1.0F; reset(); }
 
     inline T filter(const T& input) {
@@ -228,14 +228,14 @@ public:
     }
 
     inline void initLowPass(float frequencyHz, float loopTimeSeconds, float Q) {
-        assert(Q!=0.0F && "Q cannot be zero");
+        assert(Q != 0.0F && "Q cannot be zero");
         setLoopTime(loopTimeSeconds);
         setQ(Q);
         setLowPassFrequency(frequencyHz);
         reset();
     }
     inline void initNotch(float frequencyHz, float loopTimeSeconds, float Q) {
-        assert(Q!=0.0F && "Q cannot be zero");
+        assert(Q != 0.0F && "Q cannot be zero");
         setLoopTime(loopTimeSeconds);
         setQ(Q);
         setNotchFrequency(frequencyHz);
@@ -340,4 +340,44 @@ inline void BiquadFilterT<T>::setNotchFrequencyWeighted(float sinOmega, float tw
     _b1 = -two_cosOmega*a0reciprocal;
     _a1 = _b1;
     _a2 = (1.0F - alpha)*a0reciprocal;
+}
+
+
+/*!
+Simple moving average filter.
+*/
+template <typename T, size_t N>
+class FilterMovingAverageT : public FilterBaseT<T> {
+public:
+    FilterMovingAverageT() {} // cppcheck-suppress uninitMemberVar
+public:
+    inline void reset() { _sum = {}; _count = 0; _index = 0;}
+
+    inline T filter(const T& input);
+    inline T filter(const T& input, float dT) { (void)dT; return filter(input); }
+    virtual T filterVirtual(const T& input) override { return filter(input); }
+protected:
+    size_t _count {0};
+    size_t _index {0};
+    T _sum {};
+    T _samples[N];
+};
+
+template <typename T, size_t N>
+inline T FilterMovingAverageT<T, N>::filter(const T& input)
+{
+    _sum += input;
+    if (_count < N) {
+        _samples[_index++] = input;
+        ++_count;
+        return _sum/static_cast<float>(_count);
+    } else {
+        if (_index == N) {
+            _index = 0;
+        }
+        _sum -= _samples[_index];
+        _samples[_index++] = input;
+    }
+    constexpr float nReciprocal = 1.0F/N;
+    return _sum*nReciprocal;
 }

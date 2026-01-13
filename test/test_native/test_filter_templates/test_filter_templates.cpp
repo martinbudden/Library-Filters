@@ -10,7 +10,7 @@ void tearDown() {
 }
 
 // NOLINTBEGIN(cppcoreguidelines-init-variables,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
-void test_null_filter()
+void test_null_filter_float()
 {
     FilterNullT<float> filter;
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
@@ -40,7 +40,81 @@ void test_null_filter_xyz()
     TEST_ASSERT_EQUAL_FLOAT(6.0F, output.z);
 }
 
-void test_power_transfer_filter1()
+void test_moving_average_filter_float()
+{
+    FilterMovingAverageT<float, 3> filter;
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
+    TEST_ASSERT_EQUAL_FLOAT(1.5F, filter.filter(2.0F));
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(3.0F));
+    TEST_ASSERT_EQUAL_FLOAT(3.0F, filter.filter(4.0F));
+    TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(5.0F));
+    TEST_ASSERT_EQUAL_FLOAT(5.0F, filter.filter(6.0F));
+    TEST_ASSERT_EQUAL_FLOAT(7.0F, filter.filter(10.0F));
+
+    filter.reset();
+    TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
+    TEST_ASSERT_EQUAL_FLOAT(12.0F, filter.filter(20.0F));
+    TEST_ASSERT_EQUAL_FLOAT(5.0F, filter.filter(-9.0F));
+}
+
+void test_moving_average_filter_xyz()
+{
+    FilterMovingAverageT<xyz_t, 4> filter;
+    xyz_t m = filter.filter(xyz_t{1.0F, 0.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+    m = filter.filter(xyz_t{2.0F, 0.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(1.5F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+    m = filter.filter(xyz_t{3.0F, 3.0F, 0.0F});
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-2.0F, m.z);
+
+    m = filter.filter(xyz_t{4.0F, 2.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(2.5F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(1.25F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-2.25F, m.z);
+
+    m = filter.filter(xyz_t{5.0F, 2.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(3.5F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(1.75F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-2.25F, m.z);
+
+    m = filter.filter(xyz_t{6.0F, 2.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(4.5F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(2.25F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-2.25F, m.z);
+
+    m = filter.filter(xyz_t{10.0F, 2.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(6.25F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+    filter.reset();
+    m = filter.filter(xyz_t{4.0F, 2.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(4.0F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+    m = filter.filter(xyz_t{20.0F, 0.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(12.0F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+
+    m = filter.filter(xyz_t{-9.0F, 0.0F, -3.0F});
+    TEST_ASSERT_EQUAL_FLOAT(5.0F, m.x);
+    TEST_ASSERT_EQUAL_FLOAT(2.0F / 3.0F, m.y);
+    TEST_ASSERT_EQUAL_FLOAT(-3.0F, m.z);
+
+}
+
+void test_power_transfer_filter1_float()
 {
     PowerTransferFilter1T<float> filter;
 
@@ -109,7 +183,7 @@ void test_power_transfer_filter1_xyz()
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter({2.0F, 0.0F, 0.0F}).x);
 }
 
-void test_biquad_filter()
+void test_biquad_filter_float()
 {
     BiquadFilterT<float> filter;
     BiquadFilterT<float>::state_t state {};
@@ -179,11 +253,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
     UNITY_BEGIN();
 
-    RUN_TEST(test_null_filter);
+    RUN_TEST(test_null_filter_float);
     RUN_TEST(test_null_filter_xyz);
-    RUN_TEST(test_power_transfer_filter1);
+    RUN_TEST(test_moving_average_filter_float);
+    RUN_TEST(test_moving_average_filter_xyz);
+    RUN_TEST(test_power_transfer_filter1_float);
     RUN_TEST(test_power_transfer_filter1_xyz);
-    RUN_TEST(test_biquad_filter);
+    RUN_TEST(test_biquad_filter_float);
     RUN_TEST(test_biquad_filter_xyz);
 
     UNITY_END();
