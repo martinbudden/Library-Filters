@@ -17,10 +17,10 @@ private:
     enum { CAPACITY = C };
 public:
     inline size_t size() const { return _size; }
-    inline bool isEmpty() const { return _size == 0; }
-    inline bool isFull() const { return _size >= capacity(); }
-    bool pushBack(const T& value);
-    bool popFront(T& value);
+    inline bool is_empty() const { return _size == 0; }
+    inline bool is_full() const { return _size >= capacity(); }
+    bool push_back(const T& value);
+    bool pop_front(T& value);
     inline const T& operator[](size_t index) const {
         size_t pos = _begin + index;
         if (pos > capacity()) {
@@ -38,8 +38,8 @@ public:
             memcpy(&dest[CAPACITY + 1 - _begin], &_buffer[0], _end * sizeof(T));
         }
     }
-    inline size_t getBegin() { return _begin; }
-    inline size_t getEnd() { return _end; }
+    inline size_t get_begin() { return _begin; }
+    inline size_t get_end() { return _end; }
     
     inline size_t capacity() const { return CAPACITY; }
 
@@ -65,9 +65,9 @@ private:
 };
 
 template <typename T, size_t C>
-bool CircularBuffer<T, C>::pushBack(const T& value)
+bool CircularBuffer<T, C>::push_back(const T& value)
 {
-    if (isFull()) {
+    if (is_full()) {
         return false;
     }
     ++_size;
@@ -81,9 +81,9 @@ bool CircularBuffer<T, C>::pushBack(const T& value)
 }
 
 template <typename T, size_t C>
-bool CircularBuffer<T, C>::popFront(T& value)
+bool CircularBuffer<T, C>::pop_front(T& value)
 {
-    if (isEmpty()) {
+    if (is_empty()) {
         return false;
     }
     --_size;

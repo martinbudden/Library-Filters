@@ -14,9 +14,9 @@ This library contains a collection of filter classes. They have been developed f
 The filters are somewhat statically (build-time) polymorphic, and somewhat dynamically (run-time) polymorphic.<br>
 This is deliberate.<br>
 
-The filters have functions that have names and signatures in common, but the only virtual function is `filterVirtual`.
+The filters have functions that have names and signatures in common, but the only virtual function is `filter_virtual`.
 
-The filter function may called directly by calling `filter`, or indirectly (via the vtable) using `filterVirtual`.
+The filter function may called directly by calling `filter`, or indirectly (via the vtable) using `filter_virtual`.
 
 This means the the filters are somewhat interchangeable at build time, depending on which functions are used.
 
@@ -25,11 +25,11 @@ classDiagram
     class FilterNull {
         init(float k)
         reset()
-        setToPassthrough()
-        setCutoffFrequency(float cutoffFrequency, float dT)
-        setCutoffFrequencyAndReset(float cutoffFrequency, float dT)
+        set_to_passthrough()
+        set_cutoff_frequency(float cutoffFrequency, float dt)
+        set_cutoff_frequency_and_reset(float cutoffFrequency, float dt)
         filter(float input) float
-        filter(float input, float dT) float
+        filter(float input, float dt) float
     }
 ```
 
@@ -38,16 +38,16 @@ classDiagram
     class FilterMovingAverage~N~ {
         reset()
         filter(float input) float
-        filter(float input, float dT) float
+        filter(float input, float dt) float
     }
 ```
 
 ```mermaid
 classDiagram
     class ButterWorthFilter {
-        setParameters(const ButterWorthFilter& other)
+        set_parameters(const ButterWorthFilter& other)
         reset()
-        setToPassthrough()
+        set_to_passthrough()
         filter(float input) float
     }
 ```
@@ -58,11 +58,11 @@ classDiagram
         init(float alpha)
         setAlpha(float alpha)
         reset()
-        setToPassthrough()
-        setCutoffFrequency(float cutoffFrequency, float dT)
-        setCutoffFrequencyAndReset(float cutoffFrequency, float dT)
+        set_to_passthrough()
+        set_cutoff_frequency(float cutoffFrequency, float dt)
+        set_cutoff_frequency_and_reset(float cutoffFrequency, float dt)
         filter(float input) float
-        filter(float input, float dT) float
+        filter(float input, float dt) float
     }
 ```
 
@@ -71,62 +71,62 @@ classDiagram
     class PowerTransferFilter1 {
         init(float k)
         reset()
-        setToPassthrough()
-        setCutoffFrequency(float cutoffFrequency, float dT)
-        setCutoffFrequencyAndReset(float cutoffFrequency, float dT)
+        set_to_passthrough()
+        set_cutoff_frequency(float cutoffFrequency, float dt)
+        set_cutoff_frequency_and_reset(float cutoffFrequency, float dt)
         filter(float input) float
-        gainFromDelay(float delay, float dT) float $
-        gain(float cutoffFrequency, float dT) float $
+        gain_from_delay(float delay, float dt) float $
+        gain(float cutoffFrequency, float dt) float $
     }
 
     class PowerTransferFilter2 {
         init(float k)
         reset()
-        setToPassthrough()
-        setCutoffFrequency(float cutoffFrequency, float dT)
-        setCutoffFrequencyAndReset(float cutoffFrequency, float dT)
+        set_to_passthrough()
+        set_cutoff_frequency(float cutoffFrequency, float dt)
+        set_cutoff_frequency_and_reset(float cutoffFrequency, float dt)
         filter(float input) float
-        gainFromDelay(float delay, float dT) float $
-        gain(float cutoffFrequency, float dT) float $
+        gain_from_delay(float delay, float dt) float $
+        gain(float cutoffFrequency, float dt) float $
     }
 
     class PowerTransferFilter3 {
         init(float k)
         reset()
-        setToPassthrough()
-        setCutoffFrequency(float cutoffFrequency, float dT)
-        setCutoffFrequencyAndReset(float cutoffFrequency, float dT)
+        set_to_passthrough()
+        set_cutoff_frequency(float cutoffFrequency, float dt)
+        set_cutoff_frequency_and_reset(float cutoffFrequency, float dt)
         filter(float input) float
-        gainFromDelay(float delay, float dT) float $
-        gain(float cutoffFrequency, float dT) float $
+        gain_from_delay(float delay, float dt) float $
+        gain(float cutoffFrequency, float dt) float $
     }
 ```
 
 ```mermaid
 classDiagram
     class IIR_filter {
-        setWeight(float weight)
-        setParameters(float a1, float a2, float b0, float b1, float b2, float weight)
-        setParameters(float a1, float a2, float b0, float b1, float b2)
-        setParameters(const BiquadFilter& other)
+        set_weight(float weight)
+        set_parameters(float a1, float a2, float b0, float b1, float b2, float weight)
+        set_parameters(float a1, float a2, float b0, float b1, float b2)
+        set_parameters(const BiquadFilter& other)
 
         reset()
-        setToPassthrough()
+        set_to_passthrough()
 
         filter(float input) float
-        filterWeighted(float input) float
+        filter_weighted(float input) float
 
-        initNotch(float frequency, float loopTimeSeconds, float Q)
+        init_notch(float frequency, float looptime_seconds, float Q)
 
-        calculateOmega(float frequency) float
-        setLowPassFrequency(float frequency, float weight)
-        setNotchFrequency(float frequency, float weight)
-        setNotchFrequency(float sinOmega, float two_cosOmega, float weight)
+        calculate_omega(float frequency) float
+        set_low_pass_frequency(float frequency, float weight)
+        set_notch_frequency(float frequency, float weight)
+        set_notch_frequency(float sin_omega, float two_cos_omega, float weight)
 
-        calculateQ(float centerFrequency, float lowerCutoffFrequency) float $
-        setQ(float centerFrequency, float lowerCutoffFrequency)
+        calculateQ(float centerFrequency, float lower_cutoff_frequency) float $
+        setQ(float centerFrequency, float lower_cutoff_frequency)
         setQ(float Q)
         getQ() float
-        setLoopTime(float loopTimeSeconds)
+        set_looptime(float looptime_seconds)
     }
 ```

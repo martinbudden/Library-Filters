@@ -17,8 +17,8 @@ private:
     enum { CAPACITY = C };
 public:
     inline size_t size() const { return _size; }
-    inline bool isEmpty() const { return _size == 0; }
-    void pushBack(const T& value);
+    inline bool is_empty() const { return _size == 0; }
+    void push_back(const T& value);
     inline const T& operator[](size_t index) const {
         size_t pos = _begin + index;
         if (pos > capacity()) {
@@ -36,8 +36,8 @@ public:
             memcpy(&dest[CAPACITY + 1 - _begin], &_buffer[0], _end * sizeof(T));
         }
     }
-    inline size_t getBegin() { return _begin; }
-    inline size_t getEnd() { return _end; }
+    inline size_t get_begin() { return _begin; }
+    inline size_t get_end() { return _end; }
     
     inline size_t capacity() const { return CAPACITY; }
 
@@ -63,7 +63,7 @@ private:
 };
 
 template <typename T, size_t C>
-void RollingBuffer<T, C>::pushBack(const T& value)
+void RollingBuffer<T, C>::push_back(const T& value)
 {
     _buffer[_end] = value; // sizeof(_buffer) = CAPACITY + 1, so always OK to store value at _end
     ++_end;
@@ -97,7 +97,7 @@ private:
     enum { CAPACITY = C };
 public:
     inline size_t size() const { return _size; }
-    void pushBack(const T& value);
+    void push_back(const T& value);
     inline const T& operator[](size_t index) const {
         size_t pos = _begin + index;
         if (pos > capacity()) {
@@ -117,7 +117,7 @@ public:
     }
     inline size_t capacity() const { return CAPACITY; }
     inline T sum() const { return _sum; }
-    T recalculateSum();
+    T recalculate_sum();
 
     class Iterator {
     public:
@@ -142,7 +142,7 @@ private:
 };
 
 template <typename T, size_t C>
-void RollingBufferWithSum<T, C>::pushBack(const T& value)
+void RollingBufferWithSum<T, C>::push_back(const T& value)
 {
     _sum += value;
     _buffer[_end] = value; // sizeof(_buffer) = CAPACITY + 1, so always OK to store value at _end
@@ -166,7 +166,7 @@ void RollingBufferWithSum<T, C>::pushBack(const T& value)
 }
 
 template <typename T, size_t C>
-T RollingBufferWithSum<T, C>::recalculateSum()
+T RollingBufferWithSum<T, C>::recalculate_sum()
 {
     _sum = 0;
     for (auto it = begin(); it != end(); ++it) {

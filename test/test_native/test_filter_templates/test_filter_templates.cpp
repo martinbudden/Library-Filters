@@ -127,7 +127,7 @@ void test_power_transfer_filter1_float()
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
     filter.reset();
-    filter.setCutoffFrequency(100.0F, 0.001F);
+    filter.set_cutoff_frequency(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter(2.0F));
 
@@ -135,11 +135,11 @@ void test_power_transfer_filter1_float()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 
-    filter.setCutoffFrequencyAndReset(100.0F, 0.001F);
+    filter.set_cutoff_frequency_and_reset(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter(2.0F));
 
-    filter.setToPassthrough();
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 }
@@ -155,18 +155,18 @@ void test_power_transfer_filter1_xyz()
     TEST_ASSERT_EQUAL_FLOAT(2.0F, output.x);
     TEST_ASSERT_EQUAL_FLOAT(3.0F, output.y);
     TEST_ASSERT_EQUAL_FLOAT(5.0F, output.z);
-    state  = filter.getState();
+    state  = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(2.0F, state.x);
     TEST_ASSERT_EQUAL_FLOAT(3.0F, state.y);
     TEST_ASSERT_EQUAL_FLOAT(5.0F, state.z);
 
     filter.reset();
-    state  = filter.getState();
+    state  = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.z);
 
-    filter.setCutoffFrequency(100.0F, 0.001F);
+    filter.set_cutoff_frequency(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter({1.0F, 0.0F, 0.0F}).x);
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter({2.0F, 0.0F, 0.0F}).x);
 
@@ -174,11 +174,11 @@ void test_power_transfer_filter1_xyz()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter({1.0F, 0.0F, 0.0F}).x);
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter({2.0F, 0.0F, 0.0F}).x);
 
-    filter.setCutoffFrequencyAndReset(100.0F, 0.001F);
+    filter.set_cutoff_frequency_and_reset(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter({1.0F, 0.0F, 0.0F}).x);
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter({2.0F, 0.0F, 0.0F}).x);
 
-    filter.setToPassthrough();
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter({1.0F, 0.0F, 0.0F}).x);
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter({2.0F, 0.0F, 0.0F}).x);
 }
@@ -192,26 +192,26 @@ void test_biquad_filter_float()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, filter.filter(-1.0F));
-    state = filter.getState();
+    state = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, state.x1);
     TEST_ASSERT_EQUAL_FLOAT(1.0F, state.x2);
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, state.y1);
     TEST_ASSERT_EQUAL_FLOAT(1.0F, state.y2);
 
     filter.reset();
-    state = filter.getState();
+    state = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x1);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x2);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y1);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y2);
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
-    filter.setParameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
-    filter.setToPassthrough();
+    filter.set_parameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
-    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filterWeighted(1.0F));
-    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filterWeighted(2.0F));
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter_weighted(1.0F));
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter_weighted(2.0F));
 }
 
 void test_biquad_filter_xyz()
@@ -225,26 +225,26 @@ void test_biquad_filter_xyz()
     TEST_ASSERT_EQUAL_FLOAT(2.0F, output.x);
     TEST_ASSERT_EQUAL_FLOAT(3.0F, output.y);
     TEST_ASSERT_EQUAL_FLOAT(5.0F, output.z);
-    state = filter.getState();
+    state = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(2.0F, state.x1.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x2.x);
     TEST_ASSERT_EQUAL_FLOAT(2.0F, state.y1.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y2.x);
 
     filter.reset();
-    state = filter.getState();
+    state = filter.get_state();
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x1.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.x2.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y1.x);
     TEST_ASSERT_EQUAL_FLOAT(0.0F, state.y2.x);
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter({4.0F, 0.0F, 0.0F}).x);
 
-    filter.setParameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
-    filter.setToPassthrough();
+    filter.set_parameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter({1.0F, 0.0F, 0.0F}).x);
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter({2.0F, 0.0F, 0.0F}).x);
-    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filterWeighted({1.0F, 0.0F, 0.0F}).x);
-    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filterWeighted({2.0F, 0.0F, 0.0F}).x);
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter_weighted({1.0F, 0.0F, 0.0F}).x);
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter_weighted({2.0F, 0.0F, 0.0F}).x);
 }
 
 // NOLINTEND(cppcoreguidelines-init-variables,cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)

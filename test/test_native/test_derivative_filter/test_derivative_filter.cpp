@@ -19,23 +19,23 @@ void tearDown()
 void test_derivative_filter_two_point()
 {
     DerivativeFilter2point filter;
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(2.0F, 1.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(2.0F, 1.0F);
     float dx_dt = filter.derivative();
 
     TEST_ASSERT_EQUAL_FLOAT(2.0, dx_dt);
 
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(1.0F, 1.0F);
-    filter.pushBack(4.0F, 2.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(1.0F, 1.0F);
+    filter.push_back(4.0F, 2.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(3.0F, dx_dt);
 
-    filter.pushBack(9.0F, 3.0F);
+    filter.push_back(9.0F, 3.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(5.0F, dx_dt);
 
-    filter.pushBack(16.0F, 4.0F);
+    filter.push_back(16.0F, 4.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(7.0F, dx_dt);
 }
@@ -43,23 +43,23 @@ void test_derivative_filter_two_point()
 void test_derivative_filter_two_point_template()
 {
     DerivativeFilter2pointT<float> filter;
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(2.0F, 1.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(2.0F, 1.0F);
     float dx_dt = filter.derivative();
 
     TEST_ASSERT_EQUAL_FLOAT(2.0, dx_dt);
 
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(1.0F, 1.0F);
-    filter.pushBack(4.0F, 2.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(1.0F, 1.0F);
+    filter.push_back(4.0F, 2.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(3.0F, dx_dt);
 
-    filter.pushBack(9.0F, 3.0F);
+    filter.push_back(9.0F, 3.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(5.0F, dx_dt);
 
-    filter.pushBack(16.0F, 4.0F);
+    filter.push_back(16.0F, 4.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(7.0F, dx_dt);
 }
@@ -120,9 +120,9 @@ void test_derivative_filter_three_point_a()
     // y = x*x + 2*x + 3
     // dy/dx = 2*x + 2;
     DerivativeFilter3point filter;
-    filter.pushBack(6.0F, 1.0F);
-    filter.pushBack(11.0F, 2.0F);
-    filter.pushBack(18.0F, 3.0F);
+    filter.push_back(6.0F, 1.0F);
+    filter.push_back(11.0F, 2.0F);
+    filter.push_back(18.0F, 3.0F);
     const float dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(8.0F, dx_dt);
 }
@@ -132,9 +132,9 @@ void test_derivative_filter_three_point_template_a()
     // y = x*x + 2*x + 3
     // dy/dx = 2*x + 2;
     DerivativeFilter3pointT<float> filter;
-    filter.pushBack(6.0F, 1.0F);
-    filter.pushBack(11.0F, 2.0F);
-    filter.pushBack(18.0F, 3.0F);
+    filter.push_back(6.0F, 1.0F);
+    filter.push_back(11.0F, 2.0F);
+    filter.push_back(18.0F, 3.0F);
     float dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(8.0F, dx_dt);
 }
@@ -144,8 +144,8 @@ void test_derivative_filter_three_point_b()
     // y = x*x + 2*x + 3
     // dy/dx = 2*x + 2;
     DerivativeFilter3point filter;
-    filter.pushBack(6.0F, 1.0F);
-    filter.pushBack(11.0F, 2.0F);
+    filter.push_back(6.0F, 1.0F);
+    filter.push_back(11.0F, 2.0F);
     const float dx_dt = filter.filter(18.0F, 3.0F);
     TEST_ASSERT_EQUAL_FLOAT(8.0F, dx_dt);
 }
@@ -155,8 +155,8 @@ void test_derivative_filter_three_point_c()
     // y = x*x + 2*x + 3
     // dy/dx = 2*x + 2;
     DerivativeFilter3point filter;
-    filter.pushBack(6.0F, 1.0F);
-    filter.pushBack(27.0F, 4.0F);
+    filter.push_back(6.0F, 1.0F);
+    filter.push_back(27.0F, 4.0F);
     const float dx_dt = filter.filter(102.0F, 9.0F);
     TEST_ASSERT_EQUAL_FLOAT(20.0F, dx_dt);
 }
@@ -166,9 +166,9 @@ void test_derivative_filter_three_point_d()
     // y = x*x + 2*x + 3
     // dy/dx = 2*x + 2;
     DerivativeFilter3point filter;
-    filter.pushBack(0.0F, 1.0F);
-    filter.pushBack(1.0F, 2.0F);
-    filter.pushBack(2.0F, 3.0F);
+    filter.push_back(0.0F, 1.0F);
+    filter.push_back(1.0F, 2.0F);
+    filter.push_back(2.0F, 3.0F);
     //filter.fill(1.0F);
 
     float dx_dt = filter.filter(6.0F, 1.0F);
@@ -189,9 +189,9 @@ void test_derivative_filter_three_point_e()
     // x = t*t
     // dx/dt = 2*t
     DerivativeFilter3point filter;
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(2.0F, 1.0F);
-    filter.pushBack(4.0F, 2.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(2.0F, 1.0F);
+    filter.push_back(4.0F, 2.0F);
     const float dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(2.0F, dx_dt);
 }
@@ -200,8 +200,8 @@ void test_derivative_filter_step()
 {
     {DerivativeFilter3point32 filter;
     uint32_t t = 0;
-    filter.pushBack(0.0F, t++);
-    filter.pushBack(0.0F, t++);
+    filter.push_back(0.0F, t++);
+    filter.push_back(0.0F, t++);
 
     float dx_dt = filter.filter(1.0F, t++);
     TEST_ASSERT_EQUAL_FLOAT(1.5F, dx_dt);
@@ -225,7 +225,7 @@ void test_derivative_filter_step()
     // exponentially weighted moving average filter
     PowerTransferFilter1 ewma(0.5F);
     uint32_t t = 0;
-    filter.pushBack(0.0F, t++);
+    filter.push_back(0.0F, t++);
 
     float dx_dt = filter.filter(1.0F, t++);
     float f = ewma.filter(dx_dt);
@@ -258,9 +258,9 @@ void test_derivative_filter_step()
     TEST_ASSERT_EQUAL_FLOAT(0.328125F, f);}
 }
 #if false
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(1.0F, 1.0F);
-    filter.pushBack(4.0F, 2.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(1.0F, 1.0F);
+    filter.push_back(4.0F, 2.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(5.5F, dx_dt);
 
@@ -269,11 +269,11 @@ void test_derivative_filter_step()
     // t     0 1 2 3  4  5
     // x     0 1 4 9 16 25
     // dx/dt 0 2 4 6  8 10
-    filter.pushBack(9.0F, 3.0F);
+    filter.push_back(9.0F, 3.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(8.5F, dx_dt);
 
-    filter.pushBack(16.0F, 4.0F);
+    filter.push_back(16.0F, 4.0F);
     dx_dt = filter.derivative();
     TEST_ASSERT_EQUAL_FLOAT(11.5F, dx_dt);
 }
@@ -282,16 +282,16 @@ void test_derivative_filter_step()
 void test_derivative_filter_four_point()
 {
     DerivativeFilter4point filter;
-    filter.pushBack(0.0F, 0.0F);
-    filter.pushBack(1.0F, 1.0F);
-    filter.pushBack(4.0F, 2.0F);
-    filter.pushBack(9.0F, 3.0F);
+    filter.push_back(0.0F, 0.0F);
+    filter.push_back(1.0F, 1.0F);
+    filter.push_back(4.0F, 2.0F);
+    filter.push_back(9.0F, 3.0F);
     float dx_dt = filter.derivative();
 
     TEST_ASSERT_EQUAL_FLOAT(10.0, dx_dt);
 
 
-    filter.pushBack(16.0F, 4.0F);
+    filter.push_back(16.0F, 4.0F);
     dx_dt = filter.derivative();
 
     TEST_ASSERT_EQUAL_FLOAT(17.0, dx_dt);

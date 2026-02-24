@@ -46,11 +46,11 @@ void test_power_transfer_filter1()
     TEST_ASSERT_EQUAL_FLOAT(-1.0F, filter.filter(-1.0F));
 
     filter.reset();
-    TEST_ASSERT_EQUAL_FLOAT(0.0F, filter.getState());
+    TEST_ASSERT_EQUAL_FLOAT(0.0F, filter.get_state());
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
     filter.reset();
-    filter.setCutoffFrequency(100.0F, 0.001F);
+    filter.set_cutoff_frequency(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter(2.0F));
 
@@ -58,11 +58,11 @@ void test_power_transfer_filter1()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 
-    filter.setCutoffFrequencyAndReset(100.0F, 0.001F);
+    filter.set_cutoff_frequency_and_reset(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.3858696F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(1.008713F, filter.filter(2.0F));
 
-    filter.setToPassthrough();
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 }
@@ -80,7 +80,7 @@ void test_power_transfer_filter2()
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
     filter.reset();
-    filter.setCutoffFrequency(100.0F, 0.001F);
+    filter.set_cutoff_frequency(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.2440311F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(0.735024F, filter.filter(2.0F));
 
@@ -88,11 +88,11 @@ void test_power_transfer_filter2()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 
-    filter.setCutoffFrequencyAndReset(100.0F, 0.001F);
+    filter.set_cutoff_frequency_and_reset(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.2440311F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(0.735024F, filter.filter(2.0F));
 
-    filter.setToPassthrough();
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 }
@@ -110,7 +110,7 @@ void test_power_transfer_filter3()
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
     filter.reset();
-    filter.setCutoffFrequency(100.0F, 0.001F);
+    filter.set_cutoff_frequency(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.1682476F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(0.562592F, filter.filter(2.0F));
 
@@ -118,11 +118,11 @@ void test_power_transfer_filter3()
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 
-    filter.setCutoffFrequencyAndReset(100.0F, 0.001F);
+    filter.set_cutoff_frequency_and_reset(100.0F, 0.001F);
     TEST_ASSERT_EQUAL_FLOAT(0.1682476, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(0.562592F, filter.filter(2.0F));
 
-    filter.setToPassthrough();
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
 }
@@ -139,12 +139,12 @@ void test_biquad_filter()
     filter.reset();
     TEST_ASSERT_EQUAL_FLOAT(4.0F, filter.filter(4.0F));
 
-    filter.setParameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
-    filter.setToPassthrough();
+    filter.set_parameters(2.0F, 3.0F, 5.0F, 7.0F, 11.0F, 13.0F);
+    filter.set_to_passthrough();
     TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter(1.0F));
     TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter(2.0F));
-    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filterWeighted(1.0F));
-    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filterWeighted(2.0F));
+    TEST_ASSERT_EQUAL_FLOAT(1.0F, filter.filter_weighted(1.0F));
+    TEST_ASSERT_EQUAL_FLOAT(2.0F, filter.filter_weighted(2.0F));
 }
 
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)

@@ -8,8 +8,8 @@ class DerivativeFilter2pointT {
         float t;
     };
 public:
-    void pushBack(T x, float t) { _rb.pushBack(xt_t{x, t}); }
-    void fill(float dt) { _rb.pushBack(xt_t{{}, 0.0F}); _rb.pushBack(xt_t{{}, dt}); }
+    void push_back(T x, float t) { _rb.push_back(xt_t{x, t}); }
+    void fill(float dt) { _rb.push_back(xt_t{{}, 0.0F}); _rb.push_back(xt_t{{}, dt}); }
     float derivative() {
         const xt_t v0 = _rb.front();
         const xt_t v1 = _rb.back();
@@ -17,7 +17,7 @@ public:
     }
     T filter(T x, float t) {
         const xt_t v1 = xt_t{x, t};
-        _rb.pushBack(v1);
+        _rb.push_back(v1);
         const xt_t v0 = _rb.front();
         return (v1.x - v0.x) / (v1.t - v0.t);
     }
@@ -33,7 +33,7 @@ private:
         uint32_t t;
     };
 public:
-    void pushBack(T x, uint32_t t) { _rb.pushBack(xt_t{x, t}); }
+    void push_back(T x, uint32_t t) { _rb.push_back(xt_t{x, t}); }
     float derivative() {
         const xt_t v0 = _rb.front();
         const xt_t v1 = _rb.back();
@@ -41,7 +41,7 @@ public:
     }
     T filter(T x, uint32_t t) {
         const xt_t v1 = xt_t{x, t};
-        _rb.pushBack(v1);
+        _rb.push_back(v1);
         const xt_t v0 = _rb.front();
         return (v1.x - v0.x) / static_cast<float>(v1.t - v0.t);
     }
@@ -57,7 +57,7 @@ private:
         float t;
     };
 public:
-    void pushBack(T x, float t) { _rb.pushBack(xt_t{x, t}); }
+    void push_back(T x, float t) { _rb.push_back(xt_t{x, t}); }
     T derivative() {
         const xt_t p0 = _rb.front();
         const xt_t p1 = _rb[1];
@@ -74,7 +74,7 @@ public:
     }
     T filter(float x, float t) {
         const T p2 = xt_t{x, t};
-        _rb.pushBack(p2);
+        _rb.push_back(p2);
         const xt_t p0 = _rb.front();
         const xt_t p1 = _rb[1];
 
@@ -99,8 +99,8 @@ private:
         uint32_t t;
     };
 public:
-    void pushBack(T x, uint32_t t) { _rb.pushBack(xt_t{x, t}); }
-    void fill(T x, uint32_t dt) { _rb.pushBack(xt_t{{}, 0}); _rb.pushBack(xt_t{x, dt}); _rb.pushBack(xt_t{x*2.0F, 2*dt}); }
+    void push_back(T x, uint32_t t) { _rb.push_back(xt_t{x, t}); }
+    void fill(T x, uint32_t dt) { _rb.push_back(xt_t{{}, 0}); _rb.push_back(xt_t{x, dt}); _rb.push_back(xt_t{x*2.0F, 2*dt}); }
     float derivative() {
         const xt_t p0 = _rb.front();
         const xt_t p1 = _rb[1];
@@ -116,7 +116,7 @@ public:
     }
     float filter(float x, uint32_t t) {
         const xt_t p2 = xt_t{x, t};
-        _rb.pushBack(p2);
+        _rb.push_back(p2);
         const xt_t p0 = _rb.front();
         const xt_t p1 = _rb[1];
         const T x1 = p1.x - p0.x;

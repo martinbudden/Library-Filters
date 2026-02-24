@@ -18,28 +18,28 @@ void test_circular_buffer_size()
     TEST_ASSERT_EQUAL(4, cb.capacity());
 
     TEST_ASSERT_EQUAL(0, cb.size());
-    bool pushed = cb.pushBack(10);
+    bool pushed = cb.push_back(10);
     TEST_ASSERT_TRUE(pushed);
     TEST_ASSERT_EQUAL(1, cb.size());
 
-    pushed = cb.pushBack(11);
+    pushed = cb.push_back(11);
     TEST_ASSERT_TRUE(pushed);
     TEST_ASSERT_EQUAL(2, cb.size());
 
-    pushed = cb.pushBack(12);
+    pushed = cb.push_back(12);
     TEST_ASSERT_TRUE(pushed);
     TEST_ASSERT_EQUAL(3, cb.size());
 
-    pushed = cb.pushBack(13);
+    pushed = cb.push_back(13);
     TEST_ASSERT_TRUE(pushed);
     TEST_ASSERT_EQUAL(4, cb.size());
 
     // the buffer is full, so push will fail
-    pushed = cb.pushBack(14);
+    pushed = cb.push_back(14);
     TEST_ASSERT_FALSE(pushed);
     TEST_ASSERT_EQUAL(4, cb.size());
 
-    pushed = cb.pushBack(15);
+    pushed = cb.push_back(15);
     TEST_ASSERT_FALSE(pushed);
     TEST_ASSERT_EQUAL(4, cb.size());
     TEST_ASSERT_EQUAL(4, cb.capacity());
@@ -49,29 +49,29 @@ void test_circular_buffer_front_back()
 {
     static CircularBuffer<int, 4> cb;
 
-    cb.pushBack(10);
+    cb.push_back(10);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(10, cb.back());
 
-    cb.pushBack(11);
+    cb.push_back(11);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(11, cb.back());
 
-    cb.pushBack(12);
+    cb.push_back(12);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(12, cb.back());
 
-    cb.pushBack(13);
+    cb.push_back(13);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(13, cb.back());
 
     // now buffer is full
-    bool pushed = cb.pushBack(14);
+    bool pushed = cb.push_back(14);
     TEST_ASSERT_FALSE(pushed);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(13, cb.back());
 
-    pushed = cb.pushBack(15);
+    pushed = cb.push_back(15);
     TEST_ASSERT_FALSE(pushed);
     TEST_ASSERT_EQUAL(10, cb.front());
     TEST_ASSERT_EQUAL(13, cb.back());
@@ -89,7 +89,7 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    cb.pushBack(10);
+    cb.push_back(10);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -99,20 +99,7 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    cb.pushBack(11);
-    {
-    auto it = cb.begin();
-    const auto end = cb.end();
-    TEST_ASSERT_TRUE(it != end);
-    TEST_ASSERT_TRUE(*it == 10);
-    ++it;
-    TEST_ASSERT_TRUE(*it == 11);
-    TEST_ASSERT_TRUE(it != end);
-    ++it;
-    TEST_ASSERT_FALSE(it != end);
-    }
-
-    cb.pushBack(12);
+    cb.push_back(11);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -122,13 +109,10 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_TRUE(*it == 11);
     TEST_ASSERT_TRUE(it != end);
     ++it;
-    TEST_ASSERT_TRUE(*it == 12);
-    TEST_ASSERT_TRUE(it != end);
-    ++it;
     TEST_ASSERT_FALSE(it != end);
     }
 
-    cb.pushBack(13);
+    cb.push_back(12);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -141,13 +125,10 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_TRUE(*it == 12);
     TEST_ASSERT_TRUE(it != end);
     ++it;
-    TEST_ASSERT_TRUE(*it == 13);
-    TEST_ASSERT_TRUE(it != end);
-    ++it;
     TEST_ASSERT_FALSE(it != end);
     }
 
-    cb.pushBack(14);
+    cb.push_back(13);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -166,7 +147,26 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    bool pushed = cb.pushBack(15);
+    cb.push_back(14);
+    {
+    auto it = cb.begin();
+    const auto end = cb.end();
+    TEST_ASSERT_TRUE(it != end);
+    TEST_ASSERT_TRUE(*it == 10);
+    ++it;
+    TEST_ASSERT_TRUE(*it == 11);
+    TEST_ASSERT_TRUE(it != end);
+    ++it;
+    TEST_ASSERT_TRUE(*it == 12);
+    TEST_ASSERT_TRUE(it != end);
+    ++it;
+    TEST_ASSERT_TRUE(*it == 13);
+    TEST_ASSERT_TRUE(it != end);
+    ++it;
+    TEST_ASSERT_FALSE(it != end);
+    }
+
+    bool pushed = cb.push_back(15);
     TEST_ASSERT_FALSE(pushed);
     {
     auto it = cb.begin();
@@ -186,7 +186,7 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    pushed = cb.pushBack(16);
+    pushed = cb.push_back(16);
     TEST_ASSERT_FALSE(pushed);
     {
     auto it = cb.begin();
@@ -207,11 +207,11 @@ void test_circular_buffer_iteration()
     }
 
     int front {};
-    bool popped = cb.popFront(front);
+    bool popped = cb.pop_front(front);
     TEST_ASSERT_TRUE(popped);
     TEST_ASSERT_EQUAL(10, front);
 
-    cb.pushBack(17);
+    cb.push_back(17);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -230,10 +230,10 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    popped = cb.popFront(front);
+    popped = cb.pop_front(front);
     TEST_ASSERT_TRUE(popped);
     TEST_ASSERT_EQUAL(11, front);
-    cb.pushBack(18);
+    cb.push_back(18);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -252,10 +252,10 @@ void test_circular_buffer_iteration()
     TEST_ASSERT_FALSE(it != end);
     }
 
-    popped = cb.popFront(front);
+    popped = cb.pop_front(front);
     TEST_ASSERT_TRUE(popped);
     TEST_ASSERT_EQUAL(12, front);
-    cb.pushBack(19);
+    cb.push_back(19);
     {
     auto it = cb.begin();
     const auto end = cb.end();
@@ -280,37 +280,37 @@ void test_circular_buffer_copy()
     static CircularBuffer<int, 4> cb;
     static std::array<int, 4> buf;
 
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(0, cb.getEnd());
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(0, cb.get_end());
 
-    cb.pushBack(10);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(1, cb.getEnd());
+    cb.push_back(10);
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(1, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(10, buf[0]);
 
 
-    cb.pushBack(11);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(2, cb.getEnd());
+    cb.push_back(11);
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(2, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(10, buf[0]);
     TEST_ASSERT_EQUAL(11, buf[1]);
 
-    cb.pushBack(12);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(3, cb.getEnd());
+    cb.push_back(12);
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(3, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(10, buf[0]);
     TEST_ASSERT_EQUAL(11, buf[1]);
     TEST_ASSERT_EQUAL(12, buf[2]);
 
-    cb.pushBack(13);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(4, cb.getEnd());
+    cb.push_back(13);
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(4, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(10, buf[0]);
@@ -318,10 +318,10 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(12, buf[2]);
     TEST_ASSERT_EQUAL(13, buf[3]);
 
-    bool pushed = cb.pushBack(14);
+    bool pushed = cb.push_back(14);
     TEST_ASSERT_FALSE(pushed);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(4, cb.getEnd());
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(4, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(10, buf[0]);
@@ -330,11 +330,11 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(13, buf[3]);
 
     int popped {};
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(10, popped);
-    cb.pushBack(15);
-    TEST_ASSERT_EQUAL(1, cb.getBegin());
-    TEST_ASSERT_EQUAL(0, cb.getEnd());
+    cb.push_back(15);
+    TEST_ASSERT_EQUAL(1, cb.get_begin());
+    TEST_ASSERT_EQUAL(0, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(11, buf[0]);
@@ -342,11 +342,11 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(13, buf[2]);
     TEST_ASSERT_EQUAL(15, buf[3]);
 
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(11, popped);
-    cb.pushBack(16);
-    TEST_ASSERT_EQUAL(2, cb.getBegin());
-    TEST_ASSERT_EQUAL(1, cb.getEnd());
+    cb.push_back(16);
+    TEST_ASSERT_EQUAL(2, cb.get_begin());
+    TEST_ASSERT_EQUAL(1, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(12, buf[0]);
@@ -354,11 +354,11 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(15, buf[2]);
     TEST_ASSERT_EQUAL(16, buf[3]);
 
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(12, popped);
-    cb.pushBack(17);
-    TEST_ASSERT_EQUAL(3, cb.getBegin());
-    TEST_ASSERT_EQUAL(2, cb.getEnd());
+    cb.push_back(17);
+    TEST_ASSERT_EQUAL(3, cb.get_begin());
+    TEST_ASSERT_EQUAL(2, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(13, buf[0]);
@@ -366,11 +366,11 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(16, buf[2]);
     TEST_ASSERT_EQUAL(17, buf[3]);
 
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(13, popped);
-    cb.pushBack(18);
-    TEST_ASSERT_EQUAL(4, cb.getBegin());
-    TEST_ASSERT_EQUAL(3, cb.getEnd());
+    cb.push_back(18);
+    TEST_ASSERT_EQUAL(4, cb.get_begin());
+    TEST_ASSERT_EQUAL(3, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(15, buf[0]);
@@ -378,11 +378,11 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(17, buf[2]);
     TEST_ASSERT_EQUAL(18, buf[3]);
 
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(15, popped);
-    cb.pushBack(19);
-    TEST_ASSERT_EQUAL(0, cb.getBegin());
-    TEST_ASSERT_EQUAL(4, cb.getEnd());
+    cb.push_back(19);
+    TEST_ASSERT_EQUAL(0, cb.get_begin());
+    TEST_ASSERT_EQUAL(4, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(16, buf[0]);
@@ -390,15 +390,15 @@ void test_circular_buffer_copy()
     TEST_ASSERT_EQUAL(18, buf[2]);
     TEST_ASSERT_EQUAL(19, buf[3]);
 
-    cb.popFront(popped);
+    cb.pop_front(popped);
     TEST_ASSERT_EQUAL(16, popped);
-    cb.pushBack(20);
+    cb.push_back(20);
     TEST_ASSERT_EQUAL(17, cb[0]);
     TEST_ASSERT_EQUAL(18, cb[1]);
     TEST_ASSERT_EQUAL(19, cb[2]);
     TEST_ASSERT_EQUAL(20, cb[3]);
-    TEST_ASSERT_EQUAL(1, cb.getBegin());
-    TEST_ASSERT_EQUAL(0, cb.getEnd());
+    TEST_ASSERT_EQUAL(1, cb.get_begin());
+    TEST_ASSERT_EQUAL(0, cb.get_end());
     buf.fill(-1);
     cb.copy(buf);
     TEST_ASSERT_EQUAL(17, buf[0]);
