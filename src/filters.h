@@ -363,7 +363,7 @@ protected:
     size_t _count {0};
     size_t _index {0};
     float _sum {0};
-    float _samples[N];
+    std::array<float, N> _samples;
 };
 
 template <size_t N>
@@ -371,7 +371,8 @@ inline float FilterMovingAverage<N>::filter(float input)
 {
     _sum += input;
     if (_count < N) {
-        _samples[_index++] = input;
+        _samples[_index] = input;
+        ++_index;
         ++_count;
         return _sum/static_cast<float>(_count);
     } else {
@@ -379,8 +380,9 @@ inline float FilterMovingAverage<N>::filter(float input)
             _index = 0;
         }
         _sum -= _samples[_index];
-        _samples[_index++] = input;
+        _samples[_index] = input;
+        ++_index;
     }
-    constexpr float nReciprocal = 1.0F/N;
-    return _sum*nReciprocal;
+    constexpr float n_reciprocal = 1.0F/static_cast<float>(N);
+    return _sum*n_reciprocal;
 }

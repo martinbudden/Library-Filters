@@ -1,6 +1,6 @@
-#include <DerivativeFilter.h>
-#include <DerivativeFilterTemplates.h>
-#include <Filters.h>
+#include <derivative_filter_templates.h>
+#include <derivative_filters.h>
+#include <filters.h>
 #include <unity.h>
 #include <xy_type.h>
 
@@ -303,16 +303,16 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv)
 {
     UNITY_BEGIN();
 
-    /*RUN_TEST(test_derivative_filter_two_point);
+    RUN_TEST(test_derivative_filter_two_point);
     RUN_TEST(test_derivative_filter_two_point_template);
     RUN_TEST(test_quadratic_solve);
     RUN_TEST(test_derivative_filter_three_point_a);
     RUN_TEST(test_derivative_filter_three_point_template_a);
     RUN_TEST(test_derivative_filter_three_point_b);
     RUN_TEST(test_derivative_filter_three_point_c);
-    RUN_TEST(test_derivative_filter_three_point_d);*/
+    RUN_TEST(test_derivative_filter_three_point_d);
     RUN_TEST(test_derivative_filter_step);
-    //RUN_TEST(test_derivative_filter_four_point);
+    RUN_TEST(test_derivative_filter_four_point);
 
     UNITY_END();
 }

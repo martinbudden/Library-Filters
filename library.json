@@ -14,5 +14,5 @@
     "version": "0.9.4",
     "frameworks": "*",
     "platforms": "*",
-    "headers": [ "Filters.h", "FilterTemplates.h", "CircularBuffer.h", "RollingBuffer.h" ]
+    "headers": [ "filters.h", "FilterTemplates.h", "circular_buffer.h", "rolling_buffer.h" ]
 }

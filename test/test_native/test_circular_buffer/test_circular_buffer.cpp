@@ -1,4 +1,4 @@
-#include <CircularBuffer.h>
+#include <circular_buffer.h>
 #include <unity.h>
 
 void setUp()
