@@ -8,6 +8,7 @@
         "bugprone",
         "clangtidy",
         "cppcoreguidelines",
+        "ewma",
         "hicpp",
         "libc",
         "llvmlibc",
